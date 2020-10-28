@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 using JusiBase;
 //Update-Package
@@ -16,11 +17,11 @@ namespace Lichtsteuerung
         private static volatile SteuerungLogic _instance;
         private static object _syncRoot = new object();
 
-        public Multisensor Garderobe;
-        public SensorIntToBool GarderobeBewegung;
-        public SensorHelligkeit GarderobeHelligkeit;
+        public Multisensor Ankleide;
+        public SensorIntToBool AnkleideBewegung;
+        public SensorHelligkeit AnkleideHelligkeit;
 
-        public LampeHelligkeit LampeGarderobe;
+        public Schalter LichtAnkleide;
       
         private SteuerungLogic()
         {
@@ -58,18 +59,57 @@ namespace Lichtsteuerung
         public void Start()
         {
             Console.WriteLine("Steuerung starten");
-            GarderobeBewegung = new SensorIntToBool("zwave2.0.Node_030.Basic.currentValue");
-            GarderobeHelligkeit = new SensorHelligkeit("zwave2.0.Node_030.Multilevel_Sensor.illuminance");
-            Garderobe = new Multisensor();
-            Garderobe.Bewegung = GarderobeBewegung;
-            Garderobe.Helligkeit = GarderobeHelligkeit;
+            AnkleideBewegung = new SensorIntToBool("zwave2.0.Node_006.Basic.currentValue");
+            AnkleideHelligkeit = new SensorHelligkeit("zwave2.0.Node_006.Multilevel_Sensor.illuminance");
 
-            LampeGarderobe = new LampeHelligkeit(null, null, "zwave2.0.Node_034.Multilevel_Switch.currentValue", "zwave2.0.Node_034.Multilevel_Switch.targetValue");
-            LampeGarderobe.ZielHelligkeit = 55;
+            Ankleide = new Multisensor();
+            Ankleide.Bewegung = AnkleideBewegung;
+            Ankleide.Helligkeit = AnkleideHelligkeit;
+
+            
+
+            LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");
+           
 
             Console.WriteLine("JobManager wurde initialisiert");
             Console.WriteLine("Steuerung gestartet");
 
+            //zum testen           
+            Update();
+        }
+
+        public void Update()
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            Console.WriteLine("update gestartet");
+
+            //bevor es in die state machine geht mal alles hier drin machen
+            Console.WriteLine("updates der anlage holen");
+            AnkleideBewegung.Update();
+            Console.WriteLine("AnkleideBewegung update fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+            AnkleideHelligkeit.Update();
+            Console.WriteLine("AnkleideHelligkeit update fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds );
+
+            LichtAnkleide.Update();
+            Console.WriteLine("LichtAnkleide update fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+
+            string temp = sw.ElapsedMilliseconds.ToString();
+
+            //https://www.nuget.org/packages/CoordinateSharp/
+            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 5)
+            {
+                LichtAnkleide.ZielStatus = true;
+                Console.WriteLine("LichtAnkleide ZielStatus an fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds );
+            }
+            else
+            {
+                LichtAnkleide.ZielStatus = false;
+                Console.WriteLine("LichtAnkleide ZielStatus aus fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+            }           
+
+
+            sw.Stop();
         }
 
         public void Stop()

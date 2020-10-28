@@ -22,17 +22,20 @@ namespace Lichtsteuerung
             _logger = logger;
         }
 
-        [HttpGet("{messageType}", Name = "Get")]
-        public ResponseTrigger Get(string messageType, string subject, string text)
+        [HttpGet("{id}", Name = "Get")]
+        public ResponseTrigger Get(string id)
         {
 
             try
             {
                 Console.WriteLine("getter Aufruf");
+
+                SteuerungLogic.Instance.Update();
+
                 return new ResponseTrigger
                 {
                     ReturnCode = 0,
-                    ReturnState = "unbekannt"
+                    ReturnState = SteuerungLogic.Instance.StateMachine.CurrentState.ToString()
                 };
             }
             catch (Exception ex)
