@@ -22,6 +22,8 @@ namespace Lichtsteuerung
         public SensorHelligkeit AnkleideHelligkeit;
 
         public Schalter LichtAnkleide;
+
+        public SensorBool JemandZuhause;
       
         private SteuerungLogic()
         {
@@ -66,7 +68,7 @@ namespace Lichtsteuerung
             Ankleide.Bewegung = AnkleideBewegung;
             Ankleide.Helligkeit = AnkleideHelligkeit;
 
-            
+            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
 
             LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");
          
@@ -94,10 +96,13 @@ namespace Lichtsteuerung
             LichtAnkleide.Update();
             Console.WriteLine("LichtAnkleide update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, LichtAnkleide.Status);
 
+            JemandZuhause.Update();
+            Console.WriteLine("JemandZuhause update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, JemandZuhause.Status);
+
             //string temp = sw.ElapsedMilliseconds.ToString();
 
             //https://www.nuget.org/packages/CoordinateSharp/
-            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 10)
+            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 10 && JemandZuhause.Status == true)
             {
                 if (LichtAnkleide.Status == false)
                 {
