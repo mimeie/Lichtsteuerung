@@ -75,7 +75,7 @@ namespace Lichtsteuerung
             Console.WriteLine("Steuerung gestartet");
 
             //zum testen           
-            Update();
+            //Update();
         }
 
         public void Update()
@@ -87,28 +87,44 @@ namespace Lichtsteuerung
             //bevor es in die state machine geht mal alles hier drin machen
             Console.WriteLine("updates der anlage holen");
             AnkleideBewegung.Update();
-            Console.WriteLine("AnkleideBewegung update fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+            Console.WriteLine("AnkleideBewegung update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, AnkleideBewegung.Status);
             AnkleideHelligkeit.Update();
-            Console.WriteLine("AnkleideHelligkeit update fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds );
+            Console.WriteLine("AnkleideHelligkeit update fertig ausgeführt, dauer: {0}, helligkeit ist: {1}", sw.ElapsedMilliseconds, AnkleideHelligkeit.Helligkeit );
 
             LichtAnkleide.Update();
-            Console.WriteLine("LichtAnkleide update fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+            Console.WriteLine("LichtAnkleide update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, LichtAnkleide.Status);
 
-            string temp = sw.ElapsedMilliseconds.ToString();
+            //string temp = sw.ElapsedMilliseconds.ToString();
 
             //https://www.nuget.org/packages/CoordinateSharp/
             if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 10)
             {
-                LichtAnkleide.ZielStatus = true;
-                Console.WriteLine("LichtAnkleide ZielStatus an fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds );
+                if (LichtAnkleide.Status == false)
+                {
+                    LichtAnkleide.ZielStatus = true;
+                    Console.WriteLine("LichtAnkleide ZielStatus an fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+                }
+                else
+                {
+                    Console.WriteLine("LichtAnkleide ist schon an");
+                }
+
             }
             else
             {
-                LichtAnkleide.ZielStatus = false;
-                Console.WriteLine("LichtAnkleide ZielStatus aus fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
-            }           
+                if (LichtAnkleide.Status == true)
+                {
+                    LichtAnkleide.ZielStatus = false;
+                    Console.WriteLine("LichtAnkleide ZielStatus aus fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+                }
+                else
+                {
+                    Console.WriteLine("LichtAnkleide ist schon aus");
+                }
+            }
 
 
+            Console.WriteLine("Gesamtupdate fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
             sw.Stop();
         }
 
