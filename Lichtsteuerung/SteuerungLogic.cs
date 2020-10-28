@@ -69,7 +69,7 @@ namespace Lichtsteuerung
             
 
             LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");
-           
+         
 
             Console.WriteLine("JobManager wurde initialisiert");
             Console.WriteLine("Steuerung gestartet");
