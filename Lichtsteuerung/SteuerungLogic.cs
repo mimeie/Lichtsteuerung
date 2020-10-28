@@ -80,24 +80,55 @@ namespace Lichtsteuerung
             //Update();
         }
 
+
+        //parallel: https://stackoverrun.com/de/q/11724611 oder https://docs.microsoft.com/de-de/dotnet/standard/parallel-programming/how-to-use-parallel-invoke-to-execute-parallel-operations
         public void Update()
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            Console.WriteLine("update gestartet");
+            //Console.WriteLine("update gestartet");
+
+            Console.WriteLine("updates der anlage holen");
+
+            #region ParallelTasks
+            // Perform three tasks in parallel on the source array
+            Parallel.Invoke(() =>
+                    {
+                        AnkleideBewegung.Update();
+                        Console.WriteLine("AnkleideBewegung update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, AnkleideBewegung.Status);
+                    },  // close first Action
+
+                             () =>
+                             {
+                                 AnkleideHelligkeit.Update();
+                                 Console.WriteLine("AnkleideHelligkeit update fertig ausgeführt, dauer: {0}, helligkeit ist: {1}", sw.ElapsedMilliseconds, AnkleideHelligkeit.Helligkeit);
+                             }, //close second Action
+
+                             () =>
+                             {
+                                 LichtAnkleide.Update();
+                                 Console.WriteLine("LichtAnkleide update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, LichtAnkleide.Status);
+                             }, //close third Action
+
+
+                             () =>
+                             {
+                JemandZuhause.Update();
+                Console.WriteLine("JemandZuhause update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, JemandZuhause.Status);
+            } //close third Action
+                         ); //close parallel.invoke
+
+            Console.WriteLine("Returned from Parallel.Invoke, dauer {0}", sw.ElapsedMilliseconds);
+            #endregion
 
             //bevor es in die state machine geht mal alles hier drin machen
-            Console.WriteLine("updates der anlage holen");
-            AnkleideBewegung.Update();
-            Console.WriteLine("AnkleideBewegung update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, AnkleideBewegung.Status);
-            AnkleideHelligkeit.Update();
-            Console.WriteLine("AnkleideHelligkeit update fertig ausgeführt, dauer: {0}, helligkeit ist: {1}", sw.ElapsedMilliseconds, AnkleideHelligkeit.Helligkeit );
+            
+            
+            
 
-            LichtAnkleide.Update();
-            Console.WriteLine("LichtAnkleide update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, LichtAnkleide.Status);
+            
 
-            JemandZuhause.Update();
-            Console.WriteLine("JemandZuhause update fertig ausgeführt, dauer: {0}, wert ist: {1}", sw.ElapsedMilliseconds, JemandZuhause.Status);
+           
 
             //string temp = sw.ElapsedMilliseconds.ToString();
 
