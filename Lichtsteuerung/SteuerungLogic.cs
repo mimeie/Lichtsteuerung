@@ -133,7 +133,7 @@ namespace Lichtsteuerung
             //string temp = sw.ElapsedMilliseconds.ToString();
 
             //https://www.nuget.org/packages/CoordinateSharp/
-            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 10 && JemandZuhause.Status == true)
+            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 15 && JemandZuhause.Status == true)
             {
                 if (LichtAnkleide.Status == false)
                 {
