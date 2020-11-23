@@ -23,8 +23,49 @@ namespace Lichtsteuerung
             _logger = logger;
         }
 
+        //[HttpGet("{id}", Name = "Get")]
+        //public ResponseTrigger Get(string id)
+        //{
+
+        //    try
+        //    {
+        //        Stopwatch sw = new Stopwatch();
+        //        sw.Start();
+
+        //        Console.WriteLine("getter Aufruf {0}",id);
+
+        //        SteuerungLogic.Instance.Update();
+
+
+        //        Console.WriteLine("getter fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+        //        sw.Stop();
+
+        //        return new ResponseTrigger
+        //        {
+        //            ReturnCode = 0,
+        //            ReturnState = SteuerungLogic.Instance.StateMachine.CurrentState.ToString()
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Fehler bei LichtsteuerungAufruf: " + ex);
+
+        //        return new ResponseTrigger
+        //        {
+        //            ReturnCode = 0,
+        //            ReturnState = "Fehler"
+        //        };
+
+        //    }
+
+
+        //}
+
+
+        // api/lichtsteuerung/lichtankleide
+        // /api/lichtsteuerung/lichtankleide?zielElement=hallodu
         [HttpGet("{id}", Name = "Get")]
-        public ResponseTrigger Get(string id)
+        public ResponseTrigger Get(string id, string source)
         {
 
             try
@@ -32,9 +73,18 @@ namespace Lichtsteuerung
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                Console.WriteLine("getter Aufruf {0}",id);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StartProcess();
 
-                SteuerungLogic.Instance.Update();
+                if (source == null)
+                {
+                    Console.WriteLine("getter Aufruf mit Zielelement {0} ohne source", id);
+                }
+                else
+                { 
+                     Console.WriteLine("getter Aufruf mit Zielelement {0} und source {1}", id, source);
+                }
+
+                SteuerungLogic.Instance.Update();               
 
 
                 Console.WriteLine("getter fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);

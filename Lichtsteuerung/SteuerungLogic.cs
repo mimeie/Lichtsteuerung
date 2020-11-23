@@ -11,12 +11,18 @@ namespace Lichtsteuerung
 {
     public sealed class SteuerungLogic
     {
-        //für die state machine
-        public StateMachineLogic StateMachine;
-
         private static volatile SteuerungLogic _instance;
         private static object _syncRoot = new object();
 
+
+        //für die state machine
+        public StateMachineLogic StateMachine;
+
+
+        //Sublogiken
+        public LichtsteuerungAnkleidezimmer LichtsteuerungAnkleidezimmer;
+
+        //objekte
         public Multisensor Ankleide;
         public SensorIntToBool AnkleideBewegung;
         public SensorHelligkeit AnkleideHelligkeit;
@@ -33,10 +39,16 @@ namespace Lichtsteuerung
             StateMachine.CurrentState = State.Aus;
 
 
+            LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
+            
+            
+
             //StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoWaitForEntfeuchten, GotoStateWaitForEntfeuchten, State.WaitForEntfeuchten));
 
-           
+
         }
+
+     
 
         public static SteuerungLogic Instance
         {
@@ -133,7 +145,7 @@ namespace Lichtsteuerung
             //string temp = sw.ElapsedMilliseconds.ToString();
 
             //https://www.nuget.org/packages/CoordinateSharp/
-            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 20 && JemandZuhause.Status == true)
+            if (AnkleideBewegung.Status == true && AnkleideHelligkeit.Helligkeit < 50 && JemandZuhause.Status == true)
             {
                 if (LichtAnkleide.Status == false)
                 {
