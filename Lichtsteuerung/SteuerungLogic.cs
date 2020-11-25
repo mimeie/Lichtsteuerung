@@ -20,10 +20,11 @@ namespace Lichtsteuerung
 
         //Sublogiken
         public LichtsteuerungAnkleidezimmer LichtsteuerungAnkleidezimmer;
+        public LichtsteuerungGarderobe LichtsteuerungGarderobe;
 
 
-        
-      
+
+
         private SteuerungLogic()
         {
 
@@ -31,10 +32,12 @@ namespace Lichtsteuerung
 
 
             LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
-            
-            
+            LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
 
-            
+
+
+
+
 
         }
 
@@ -65,6 +68,7 @@ namespace Lichtsteuerung
             Console.WriteLine("Steuerung starten");
 
             LichtsteuerungAnkleidezimmer.Initialize();
+            LichtsteuerungGarderobe.Initialize();
 
 
 

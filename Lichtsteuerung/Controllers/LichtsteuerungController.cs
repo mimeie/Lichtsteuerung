@@ -80,13 +80,19 @@ namespace Lichtsteuerung
                 }
                 else
                 { 
-                     Console.WriteLine("getter Aufruf mit Zielelement {0} und source {1}", id, source);
-                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaiseDataChange(source);
+                    Console.WriteLine("getter Aufruf mit Zielelement {0} und source {1}", id, source);
+                    switch (id)
+                    {
+                        case "lichtankleide":
+                            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaiseDataChange(source);
+                            break;
+                        case "lichtgarderobe":
+                            SteuerungLogic.Instance.LichtsteuerungGarderobe.RaiseDataChange(source);
+                            break;
+
+                    }
                 }
-
-                        
-
-
+                                     
                 Console.WriteLine("getter fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
                 sw.Stop();
 

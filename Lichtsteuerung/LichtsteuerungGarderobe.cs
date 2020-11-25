@@ -11,7 +11,7 @@ namespace Lichtsteuerung
 {
     //https://www.tutorialsteacher.com/csharp/csharp-event
 
-    public class LichtsteuerungAnkleidezimmer
+    public class LichtsteuerungGarderobe
     {
         public event EventHandler<string> DataChange;
 
@@ -19,26 +19,29 @@ namespace Lichtsteuerung
         public StateMachineLogic StateMachine;
 
         //objekte
-        public Multisensor Ankleide;
-        public SensorIntToBool AnkleideBewegung;
-        public SensorHelligkeit AnkleideHelligkeit;
+        public Multisensor Garderobe;
+        public SensorIntToBool GarderobeBewegung;
+        public SensorHelligkeit GarderobeHelligkeit;
 
-        public Schalter LichtAnkleide;
+        public SensorIntToBool HaustuerBewegung;
+
+        public LampeHelligkeit LichtGarderobe;
 
         public SensorBool JemandZuhause;
 
-        public LichtsteuerungAnkleidezimmer()
+        public LichtsteuerungGarderobe()
         {
-            AnkleideBewegung = new SensorIntToBool("zwave2.0.Node_006.Basic.currentValue");
-            AnkleideHelligkeit = new SensorHelligkeit("zwave2.0.Node_006.Multilevel_Sensor.illuminance",50);
+            GarderobeBewegung = new SensorIntToBool("zwave2.0.Node_030.Basic.currentValue");
+            GarderobeHelligkeit = new SensorHelligkeit("zwave2.0.Node_030.Multilevel_Sensor.illuminance", 50);
+            HaustuerBewegung = new SensorIntToBool("zwave2.0.Node_023.Basic.currentValue");
 
-            Ankleide = new Multisensor();
-            Ankleide.Bewegung = AnkleideBewegung;
-            Ankleide.Helligkeit = AnkleideHelligkeit;
+            Garderobe = new Multisensor();
+            Garderobe.Bewegung = GarderobeBewegung;
+            Garderobe.Helligkeit = GarderobeHelligkeit;
 
             JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
 
-            LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");
+            LichtGarderobe = new LampeHelligkeit("", "", "zwave2.0.Node_034.Multilevel_Switch.targetValue", "zwave2.0.Node_034.Multilevel_Switch.targetValue");
 
 
             //StateMachine init
@@ -47,7 +50,7 @@ namespace Lichtsteuerung
 
             StateMachine._transitions.Add(new StatesTransition(State.Deaktiviert, Signal.GotoAus, GotoStateAus, State.Aus));
 
-            StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoDeaktiviert, GotoStateDeaktiviert,State.Deaktiviert));
+            StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoDeaktiviert, GotoStateDeaktiviert, State.Deaktiviert));
             StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoReadyForAction, GotoStateReadyForAction, State.ReadyForAction));
 
             StateMachine._transitions.Add(new StatesTransition(State.ReadyForAction, Signal.GotoAus, GotoStateAus, State.Aus));
@@ -67,9 +70,10 @@ namespace Lichtsteuerung
         {
 
             Console.WriteLine("updates der anlage holen");
-            AnkleideBewegung.Update();
-            AnkleideHelligkeit.Update();
-            LichtAnkleide.Update();
+            GarderobeBewegung.Update();
+            GarderobeHelligkeit.Update();
+            HaustuerBewegung.Update();
+            LichtGarderobe.UpdateHelligkeit();
             JemandZuhause.Update();
             Console.WriteLine("updates der anlage geholt");
 
@@ -80,9 +84,9 @@ namespace Lichtsteuerung
         private void GotoStateAus()
         {
             Console.WriteLine("Executed: GotoStateAus");
-            if (LichtAnkleide.Status == true)
+            if (LichtGarderobe.Helligkeit > 0)
             {
-                LichtAnkleide.ZielStatus = false;
+                LichtGarderobe.ZielHelligkeit = 0;
             }
 
         }
@@ -90,64 +94,78 @@ namespace Lichtsteuerung
         private void GotoStateDeaktiviert()
         {
             Console.WriteLine("Executed: GotoStateDeaktiviert");
-            if (LichtAnkleide.Status == true)
+            if (LichtGarderobe.Helligkeit > 0)
             {
-                LichtAnkleide.ZielStatus = false;
+                LichtGarderobe.ZielHelligkeit = 0;
             }
-                    
+
         }
 
         private void GotoStateAction()
         {
             Console.WriteLine("Executed: GotoStateAction");
-            if (LichtAnkleide.Status == false)
+            if (LichtGarderobe.Helligkeit == 0)
             {
-                LichtAnkleide.ZielStatus = true;
+                LichtGarderobe.ZielHelligkeit = 70;
             }
         }
 
         private void GotoStateReadyForAction()
         {
             Console.WriteLine("Executed: GotoStateReadyForAction");
-            if (LichtAnkleide.Status == true)
+            if (LichtGarderobe.Helligkeit > 0)
             {
-                LichtAnkleide.ZielStatus = false;
+                LichtGarderobe.ZielHelligkeit = 0;
             }
         }
 
         private void LichtsteuerungLogik()
         {
-            Console.WriteLine("Ankleide lichtsteuerung abarbeiten, aktueller Status: {0}", StateMachine.CurrentState);
+            Console.WriteLine("Garderobe lichtsteuerung abarbeiten, aktueller Status: {0}", StateMachine.CurrentState);
             if (JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
                 return;
             }
-            else if  (JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
+            else if (JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoAus);
             }
 
             Console.WriteLine("Helligkeit überprüfen");
-            if (StateMachine.CurrentState == State.Aus && AnkleideHelligkeit.Helligkeit < AnkleideHelligkeit.Abschaltlevel)
+            if (StateMachine.CurrentState == State.Aus && GarderobeHelligkeit.Helligkeit < GarderobeHelligkeit.Abschaltlevel)
             {
                 StateMachine.ExecuteAction(Signal.GotoReadyForAction);
-            }    
-            else if (AnkleideHelligkeit.Helligkeit > AnkleideHelligkeit.Abschaltlevel)
+            }
+            else if (GarderobeHelligkeit.Helligkeit > GarderobeHelligkeit.Abschaltlevel)
             {
                 StateMachine.ExecuteAction(Signal.GotoAus);
             }
 
-            Console.WriteLine("Bewegungszustand überprüfen");
-            if (AnkleideBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
+            Console.WriteLine("Bewegungszustand bei Garderobe selbst überprüfen");
+            if (GarderobeBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
+            {
+                StateMachine.ExecuteAction(Signal.GotoAction);
+                return;
+            }
+            else if (GarderobeBewegung.Status == false && StateMachine.CurrentState == State.Action)
+            {
+                StateMachine.ExecuteAction(Signal.GotoReadyForAction);
+                return;
+            }
+
+            Console.WriteLine("Bewegungszustand bei Haustür selbst überprüfen");
+            if (HaustuerBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
             {
                 StateMachine.ExecuteAction(Signal.GotoAction);
             }
-            else if (AnkleideBewegung.Status == false && StateMachine.CurrentState == State.Action)
+            else if (HaustuerBewegung.Status == false && GarderobeBewegung.Status == false && StateMachine.CurrentState == State.Action)
             {
-                StateMachine.ExecuteAction(Signal.GotoReadyForAction);
-            }            
-            Console.WriteLine("Ankleide lichtsteuerung abgearbeitet, neuer Status: {0}", StateMachine.CurrentState);
+                StateMachine.ExecuteAction(Signal.GotoReadyForAction);                
+            }
+
+
+            Console.WriteLine("Garderobe lichtsteuerung abgearbeitet, neuer Status: {0}", StateMachine.CurrentState);
         }
 
 
@@ -164,22 +182,25 @@ namespace Lichtsteuerung
             switch (source)
             {
                 case nameof(JemandZuhause):
-                    JemandZuhause.Update();               
-                    break;                
-                case nameof(AnkleideHelligkeit):
-                    AnkleideHelligkeit.Update();
+                    JemandZuhause.Update();
                     break;
-                case nameof(AnkleideBewegung):
-                    AnkleideBewegung.Update();           
+                case nameof(GarderobeHelligkeit):
+                    GarderobeHelligkeit.Update();
                     break;
-                //case nameof(LichtAnkleide):
-                //    LichtAnkleide.Update();
-                //    break;
+                case nameof(GarderobeBewegung):
+                    GarderobeBewegung.Update();
+                    break;
+                case nameof(HaustuerBewegung):
+                    HaustuerBewegung.Update();
+                    break;
+                    //case nameof(LichtAnkleide):
+                    //    LichtAnkleide.Update();
+                    //    break;
             }
 
             LichtsteuerungLogik();
 
-           
+
 
         }
 
