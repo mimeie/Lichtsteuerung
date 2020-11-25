@@ -63,7 +63,7 @@ namespace Lichtsteuerung
 
 
         // api/lichtsteuerung/lichtankleide
-        // /api/lichtsteuerung/lichtankleide?zielElement=hallodu
+        // /api/lichtsteuerung/lichtankleide?source=JemandZuhause
         [HttpGet("{id}", Name = "Get")]
         public ResponseTrigger Get(string id, string source)
         {
@@ -73,8 +73,7 @@ namespace Lichtsteuerung
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
 
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StartProcess();
-
+                
                 if (source == null)
                 {
                     Console.WriteLine("getter Aufruf mit Zielelement {0} ohne source", id);
@@ -82,9 +81,10 @@ namespace Lichtsteuerung
                 else
                 { 
                      Console.WriteLine("getter Aufruf mit Zielelement {0} und source {1}", id, source);
+                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaiseDataChange(source);
                 }
 
-                SteuerungLogic.Instance.Update();               
+                        
 
 
                 Console.WriteLine("getter fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
@@ -93,7 +93,7 @@ namespace Lichtsteuerung
                 return new ResponseTrigger
                 {
                     ReturnCode = 0,
-                    ReturnState = SteuerungLogic.Instance.StateMachine.CurrentState.ToString()
+                    ReturnState = SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState.ToString()
                 };
             }
             catch (Exception ex)

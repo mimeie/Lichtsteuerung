@@ -29,7 +29,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/lichtsteuerung/lichtankleide",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/lichtsteuerung/lichtankleide?source=JemandZuhause",
       "publishAllPorts": true
     }
   }
