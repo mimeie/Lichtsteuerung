@@ -27,7 +27,7 @@ namespace Lichtsteuerung
 
         public LampeHelligkeit LichtGarderobe;
 
-        public SensorBool JemandZuhause;
+      
 
         public LichtsteuerungGarderobe()
         {
@@ -39,7 +39,7 @@ namespace Lichtsteuerung
             Garderobe.Bewegung = GarderobeBewegung;
             Garderobe.Helligkeit = GarderobeHelligkeit;
 
-            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
+           
 
             LichtGarderobe = new LampeHelligkeit("", "", "zwave2.0.Node_034.Multilevel_Switch.targetValue", "zwave2.0.Node_034.Multilevel_Switch.targetValue");
 
@@ -63,7 +63,8 @@ namespace Lichtsteuerung
 
 
 
-            DataChange += DoDataChange;
+           
+            
         }
 
         public void Initialize()
@@ -74,7 +75,12 @@ namespace Lichtsteuerung
             GarderobeHelligkeit.Update();
             HaustuerBewegung.Update();
             LichtGarderobe.UpdateHelligkeit();
-            JemandZuhause.Update();
+
+            GarderobeBewegung.DataChange += DoDataChange;
+            GarderobeHelligkeit.DataChange += DoDataChange;
+            HaustuerBewegung.DataChange += DoDataChange;
+            SteuerungLogic.Instance.JemandZuhause.DataChange += DoDataChange;
+
             Console.WriteLine("updates der anlage geholt");
 
             LichtsteuerungLogik();
@@ -122,12 +128,12 @@ namespace Lichtsteuerung
         private void LichtsteuerungLogik()
         {
             Console.WriteLine("Garderobe lichtsteuerung abarbeiten, aktueller Status: {0}", StateMachine.CurrentState);
-            if (JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
+            if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
                 return;
             }
-            else if (JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
+            else if (SteuerungLogic.Instance.JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoAus);
             }
@@ -175,28 +181,9 @@ namespace Lichtsteuerung
             DataChange?.Invoke(this, source);
         }
 
-        private void DoDataChange(object sender, string source)
+        private void DoDataChange(object sender, Objekt source)
         {
-            Console.WriteLine("DataChange: {0}", source);
-
-            switch (source)
-            {
-                case nameof(JemandZuhause):
-                    JemandZuhause.Update();
-                    break;
-                case nameof(GarderobeHelligkeit):
-                    GarderobeHelligkeit.Update();
-                    break;
-                case nameof(GarderobeBewegung):
-                    GarderobeBewegung.Update();
-                    break;
-                case nameof(HaustuerBewegung):
-                    HaustuerBewegung.Update();
-                    break;
-                    //case nameof(LichtAnkleide):
-                    //    LichtAnkleide.Update();
-                    //    break;
-            }
+            Console.WriteLine("DataChange für garderobe: {0}", source);           
 
             LichtsteuerungLogik();
 

@@ -38,7 +38,7 @@ namespace Lichtsteuerung
 
 
             JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
-            JemandZuhause.DataChange += DoDataChange;
+            //braucht es im moment nicht JemandZuhause.DataChange += DoDataChange; 
 
 
 
@@ -91,7 +91,7 @@ namespace Lichtsteuerung
         {
         }
 
-        private void DoDataChange(object sender, Objekt source)
+        private void DoDataChange(object sender, Objekt source) //im moment im singleton nicht gebraucht
         {
             try
             {                

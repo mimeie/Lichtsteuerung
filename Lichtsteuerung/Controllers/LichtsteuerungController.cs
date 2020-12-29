@@ -84,13 +84,33 @@ namespace Lichtsteuerung
                     switch (id)
                     {
                         case "lichtankleide":
-                            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaiseDataChange(source);
+                            switch (source)
+                            {
+                                case "AnkleideBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.RaiseDataChange(true);
+                                    break;
+                                case "AnkleideHelligkeit":
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.RaiseDataChange(true);
+                                    break;
+                            }                                                   
                             break;
                         case "lichtgarderobe":
-                            SteuerungLogic.Instance.LichtsteuerungGarderobe.RaiseDataChange(source);
+                            switch (source)
+                            {
+                                case "GarderobeBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungGarderobe.GarderobeBewegung.RaiseDataChange(true);
+                                    break;
+                                case "GarderobeHelligkeit":
+                                    SteuerungLogic.Instance.LichtsteuerungGarderobe.GarderobeHelligkeit.RaiseDataChange(true);
+                                    break;
+                                case "HaustuerBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungGarderobe.HaustuerBewegung.RaiseDataChange(true);
+                                    break;
+                            }
+                            
                             break;
                         case "allgemein":
-                            SteuerungLogic.Instance.JemandZuhause.RaiseDataChange();
+                            SteuerungLogic.Instance.JemandZuhause.RaiseDataChange(true);
                             break;
 
                     }

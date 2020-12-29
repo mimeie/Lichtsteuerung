@@ -13,30 +13,28 @@ namespace Lichtsteuerung
 
     public class LichtsteuerungAnkleidezimmer
     {
-        public event EventHandler<string> DataChange;
+      
 
         //für die state machine
         public StateMachineLogic StateMachine;
 
         //objekte
-        public Multisensor Ankleide;
-        public SensorIntToBool AnkleideBewegung;
+        public Bewegungsmelder Ankleide; //theoretisch nicht nötig
+        public SensorBool AnkleideBewegung;
         public SensorHelligkeit AnkleideHelligkeit;
 
         public Schalter LichtAnkleide;
 
-        public SensorBool JemandZuhause;
+        
 
         public LichtsteuerungAnkleidezimmer()
         {
-            AnkleideBewegung = new SensorIntToBool("zwave2.0.Node_006.Basic.currentValue");
-            AnkleideHelligkeit = new SensorHelligkeit("zwave2.0.Node_006.Multilevel_Sensor.illuminance",50);
+            AnkleideBewegung = new SensorBool("zigbee.0.00158d00063a6d54.occupancy");
+            AnkleideHelligkeit = new SensorHelligkeit("zigbee.0.00158d00063a6d54.illuminance", 50);
 
-            Ankleide = new Multisensor();
+            Ankleide = new Bewegungsmelder();
             Ankleide.Bewegung = AnkleideBewegung;
             Ankleide.Helligkeit = AnkleideHelligkeit;
-
-            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
 
             LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");
 
@@ -60,7 +58,7 @@ namespace Lichtsteuerung
 
 
 
-            DataChange += DoDataChange;
+            
         }
 
         public void Initialize()
@@ -70,7 +68,11 @@ namespace Lichtsteuerung
             AnkleideBewegung.Update();
             AnkleideHelligkeit.Update();
             LichtAnkleide.Update();
-            JemandZuhause.Update();
+
+            AnkleideBewegung.DataChange += DoDataChange;
+            AnkleideBewegung.DataChange += DoDataChange;
+            SteuerungLogic.Instance.JemandZuhause.DataChange += DoDataChange;
+
             Console.WriteLine("updates der anlage geholt");
 
             LichtsteuerungLogik();
@@ -117,13 +119,13 @@ namespace Lichtsteuerung
 
         private void LichtsteuerungLogik()
         {
-            Console.WriteLine("Ankleide lichtsteuerung abarbeiten, aktueller Status: {0}", StateMachine.CurrentState);
-            if (JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
+            Console.WriteLine("Ankleide lichtsteuerung abarbeiten, aktueller Status: {0}, Zuhause: {1}, Bewegung: {2}, helligkeit: {3}", StateMachine.CurrentState,SteuerungLogic.Instance.JemandZuhause.Status, AnkleideBewegung.Status, AnkleideHelligkeit.Helligkeit);
+            if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
                 return;
             }
-            else if  (JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
+            else if  (SteuerungLogic.Instance.JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoAus);
             }
@@ -151,31 +153,10 @@ namespace Lichtsteuerung
         }
 
 
-        public void RaiseDataChange(string source)
-        //protected virtual void OnProcessCompleted(SensorBool sensorBool)
-        {
-            DataChange?.Invoke(this, source);
-        }
 
-        private void DoDataChange(object sender, string source)
+        private void DoDataChange(object sender, Objekt source)
         {
-            Console.WriteLine("DataChange: {0}", source);
-
-            switch (source)
-            {
-                case nameof(JemandZuhause):
-                    JemandZuhause.Update();               
-                    break;                
-                case nameof(AnkleideHelligkeit):
-                    AnkleideHelligkeit.Update();
-                    break;
-                case nameof(AnkleideBewegung):
-                    AnkleideBewegung.Update();           
-                    break;
-                //case nameof(LichtAnkleide):
-                //    LichtAnkleide.Update();
-                //    break;
-            }
+            Console.WriteLine("DataChange für ankleidezimmer : {0}", source);
 
             LichtsteuerungLogik();
 
