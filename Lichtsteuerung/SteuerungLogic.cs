@@ -69,6 +69,8 @@ namespace Lichtsteuerung
         {
             Console.WriteLine("Steuerung starten");
 
+            JemandZuhause.Update();
+
             LichtsteuerungAnkleidezimmer.Initialize();
             LichtsteuerungGarderobe.Initialize();
 
