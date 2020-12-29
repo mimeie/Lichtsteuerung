@@ -63,7 +63,7 @@ namespace Lichtsteuerung
 
 
         // api/lichtsteuerung/lichtankleide
-        // /api/lichtsteuerung/lichtankleide?source=JemandZuhause
+        // /api/lichtsteuerung/allgemein?source=JemandZuhause
         [HttpGet("{id}", Name = "Get")]
         public ResponseTrigger Get(string id, string source)
         {
