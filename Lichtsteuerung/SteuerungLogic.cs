@@ -17,6 +17,7 @@ namespace Lichtsteuerung
 
 
         public SensorBool JemandZuhause; //master
+        //master2
 
 
         //Sublogiken
