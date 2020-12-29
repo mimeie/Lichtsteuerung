@@ -15,7 +15,8 @@ namespace Lichtsteuerung
         private static object _syncRoot = new object();
 
 
-       
+
+        public SensorBool JemandZuhause;
 
 
         //Sublogiken
@@ -35,7 +36,8 @@ namespace Lichtsteuerung
             LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
 
 
-
+            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
+            JemandZuhause.DataChange += DoDataChange;
 
 
 
@@ -84,6 +86,19 @@ namespace Lichtsteuerung
 
         public void Stop()
         {
+        }
+
+        private void DoDataChange(object sender, Objekt source)
+        {
+            try
+            {                
+                source.Update();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fehler beim DoDataChange", ex);
+                //throw;
+            }
         }
 
 

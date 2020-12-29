@@ -63,7 +63,7 @@ namespace Lichtsteuerung
 
 
         // api/lichtsteuerung/lichtankleide
-        // /api/lichtsteuerung/lichtankleide?source=JemandZuhause
+        // /api/lichtsteuerung/allgemein?source=JemandZuhause
         [HttpGet("{id}", Name = "Get")]
         public ResponseTrigger Get(string id, string source)
         {
@@ -88,6 +88,9 @@ namespace Lichtsteuerung
                             break;
                         case "lichtgarderobe":
                             SteuerungLogic.Instance.LichtsteuerungGarderobe.RaiseDataChange(source);
+                            break;
+                        case "allgemein":
+                            SteuerungLogic.Instance.JemandZuhause.RaiseDataChange();
                             break;
 
                     }
