@@ -89,6 +89,9 @@ namespace Lichtsteuerung
                         case "lichtgarderobe":
                             SteuerungLogic.Instance.LichtsteuerungGarderobe.RaiseDataChange(source);
                             break;
+                        case "allgemein":
+                            SteuerungLogic.Instance.JemandZuhause.RaiseDataChange();
+                            break;
 
                     }
                 }
