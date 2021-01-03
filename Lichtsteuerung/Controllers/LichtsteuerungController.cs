@@ -92,6 +92,9 @@ namespace Lichtsteuerung
                                 case "AnkleideHelligkeit":
                                     SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.RaiseDataChange(true);
                                     break;
+                                case "AnkleideTuer":
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideTuer.RaiseDataChange(true);
+                                    break;
                             }                                                   
                             break;
                         case "lichtgarderobe":
