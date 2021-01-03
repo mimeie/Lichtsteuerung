@@ -131,7 +131,7 @@ namespace Lichtsteuerung
 
         private void LichtsteuerungLogik()
         {
-            Console.WriteLine("Ankleide lichtsteuerung abarbeiten, aktueller Status: {0}, Zuhause: {1}, Bewegung: {2}, helligkeit: {3}, Tür: {4}, bewegung restlaufzeit und last change: {5} {6}", StateMachine.CurrentState,SteuerungLogic.Instance.JemandZuhause.Status, AnkleideBewegung.Status, AnkleideHelligkeit.Helligkeit,AnkleideTuer.Status, AnkleideBewegung.RestlaufzeitMinutes, AnkleideBewegung.LastChange);
+            Console.WriteLine("Ankleide lichtsteuerung abarbeiten, aktueller Status: {0}, Zuhause: {1}, Bewegung: {2}, helligkeit: {3}, Tür: {4}, bewegung restlaufzeit und last change: {5} {6}", StateMachine.CurrentState,SteuerungLogic.Instance.JemandZuhause.Status, AnkleideBewegung.Status, AnkleideHelligkeit.Helligkeit,AnkleideTuer.Status, AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue), AnkleideBewegung.LastChange);
             if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
             {
                 StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
@@ -164,15 +164,15 @@ namespace Lichtsteuerung
             else if (AnkleideBewegung.Status == false && StateMachine.CurrentState == State.Action)
             {
                 //erst nach Ablauf der Restlaufzeit gehen
-                if (AnkleideBewegung.HasRestlaufzeit == false)
+                if (AnkleideBewegung.HasRestlaufzeit(AnkleideBewegung.LastChangeTrue) == false)
                 {
                     Console.WriteLine("Licht kann wieder ausgeschaltet werden, keine Restlaufzeit");
                     StateMachine.ExecuteAction(Signal.GotoReadyForAction);
                 }
                 else
                 {
-                    Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", AnkleideBewegung.RestlaufzeitMinutes);
-                    Task.Delay(TimeSpan.FromMinutes(AnkleideBewegung.RestlaufzeitMinutes)).ContinueWith(t => LichtsteuerungLogik());
+                    Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue));
+                    Task.Delay(TimeSpan.FromMinutes(AnkleideBewegung.RestlaufzeitMinutes((AnkleideBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik());
                     Console.WriteLine("ausschalten getriggert");
                 }
                 return;
