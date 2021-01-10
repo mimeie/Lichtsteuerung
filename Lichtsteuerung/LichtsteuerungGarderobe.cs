@@ -21,7 +21,7 @@ namespace Lichtsteuerung
 
         //objekte
         //public Multisensor Garderobe;
-        public SensorIntToBool GarderobeBewegung;
+        public SensorBool GarderobeBewegung;
         public SensorHelligkeit GarderobeHelligkeit;
 
         public SensorIntToBool HaustuerBewegung;
@@ -32,9 +32,9 @@ namespace Lichtsteuerung
 
         public LichtsteuerungGarderobe()
         {
-            GarderobeBewegung = new SensorIntToBool("zwave2.0.Node_030.Basic.currentValue");
+            GarderobeBewegung = new SensorBool("zigbee.0.00158d00057f826b.occupancy");
             GarderobeBewegung.MinLaufzeitMinutes = 5;
-            GarderobeHelligkeit = new SensorHelligkeit("zwave2.0.Node_030.Multilevel_Sensor.illuminance", 50);
+            GarderobeHelligkeit = new SensorHelligkeit("zigbee.0.00158d00057f826b.illuminance", 70);
             HaustuerBewegung = new SensorIntToBool("zwave2.0.Node_023.Basic.currentValue");
 
             //Garderobe = new Multisensor();
