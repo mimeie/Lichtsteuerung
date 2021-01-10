@@ -9,17 +9,18 @@ using JusiBase;
 
 namespace Lichtsteuerung
 {
-    //https://www.tutorialsteacher.com/csharp/csharp-event
+    
 
     public class LichtsteuerungGarderobe
     {
-        public event EventHandler<string> DataChange;
+
+        static readonly object logikLock = new object();        
 
         //für die state machine
         public StateMachineLogic StateMachine;
 
         //objekte
-        public Multisensor Garderobe;
+        //public Multisensor Garderobe;
         public SensorIntToBool GarderobeBewegung;
         public SensorHelligkeit GarderobeHelligkeit;
 
@@ -32,12 +33,13 @@ namespace Lichtsteuerung
         public LichtsteuerungGarderobe()
         {
             GarderobeBewegung = new SensorIntToBool("zwave2.0.Node_030.Basic.currentValue");
+            GarderobeBewegung.MinLaufzeitMinutes = 5;
             GarderobeHelligkeit = new SensorHelligkeit("zwave2.0.Node_030.Multilevel_Sensor.illuminance", 50);
             HaustuerBewegung = new SensorIntToBool("zwave2.0.Node_023.Basic.currentValue");
 
-            Garderobe = new Multisensor();
-            Garderobe.Bewegung = GarderobeBewegung;
-            Garderobe.Helligkeit = GarderobeHelligkeit;
+            //Garderobe = new Multisensor();
+            //Garderobe.Bewegung = GarderobeBewegung;
+            //Garderobe.Helligkeit = GarderobeHelligkeit;
 
            
 
@@ -112,7 +114,7 @@ namespace Lichtsteuerung
             Console.WriteLine("Executed: GotoStateAction");
             if (LichtGarderobe.Helligkeit == 0)
             {
-                LichtGarderobe.ZielHelligkeit = 70;
+                LichtGarderobe.ZielHelligkeit = 80;
             }
         }
 
@@ -127,59 +129,74 @@ namespace Lichtsteuerung
 
         private void LichtsteuerungLogik()
         {
-            Console.WriteLine("Garderobe lichtsteuerung abarbeiten, aktueller Status: {0}", StateMachine.CurrentState);
-            if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
+            lock (logikLock)
             {
-                StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
-                return;
-            }
-            else if (SteuerungLogic.Instance.JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
-            {
-                StateMachine.ExecuteAction(Signal.GotoAus);
-            }
+                Console.WriteLine("Garderobe Lichtsteuerung abarbeiten, aktueller Status: {0}", StateMachine.CurrentState);
+                if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
+                    return;
+                }
+                else if (SteuerungLogic.Instance.JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoAus);
+                    return;
+                }
 
-            Console.WriteLine("Helligkeit überprüfen");
-            if (StateMachine.CurrentState == State.Aus && GarderobeHelligkeit.Helligkeit < GarderobeHelligkeit.Abschaltlevel)
-            {
-                StateMachine.ExecuteAction(Signal.GotoReadyForAction);
-            }
-            else if (GarderobeHelligkeit.Helligkeit > GarderobeHelligkeit.Abschaltlevel)
-            {
-                StateMachine.ExecuteAction(Signal.GotoAus);
-            }
+                Console.WriteLine("Helligkeit überprüfen");
+                if (StateMachine.CurrentState == State.Aus && GarderobeHelligkeit.Helligkeit < GarderobeHelligkeit.Abschaltlevel)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoReadyForAction);
+                    return;
+                }
+                else if (GarderobeHelligkeit.Helligkeit > GarderobeHelligkeit.Abschaltlevel)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoAus);
+                    return;
+                }
 
-            Console.WriteLine("Bewegungszustand bei Garderobe selbst überprüfen");
-            if (GarderobeBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
-            {
-                StateMachine.ExecuteAction(Signal.GotoAction);
-                return;
-            }
-            else if (GarderobeBewegung.Status == false && StateMachine.CurrentState == State.Action)
-            {
-                StateMachine.ExecuteAction(Signal.GotoReadyForAction);
-                return;
-            }
+                Console.WriteLine("Bewegungszustand bei Garderobe selbst überprüfen");
+                if (GarderobeBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoAction);
+                    return;
+                }
+                else if (GarderobeBewegung.Status == false && StateMachine.CurrentState == State.Action)
+                {
+                    //erst nach Ablauf der Restlaufzeit gehen
+                    if (GarderobeBewegung.HasRestlaufzeit(GarderobeBewegung.LastChangeTrue) == false)
+                    {
+                        Console.WriteLine("Licht kann wieder ausgeschaltet werden, keine Restlaufzeit");
+                        StateMachine.ExecuteAction(Signal.GotoReadyForAction);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", GarderobeBewegung.RestlaufzeitMinutes(GarderobeBewegung.LastChangeTrue));
+                        Task.Delay(TimeSpan.FromMinutes(GarderobeBewegung.RestlaufzeitMinutes(GarderobeBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik());
+                        Console.WriteLine("späteres ausschalten getriggert");
+                    }                   
+                    return;
+                }
 
-            Console.WriteLine("Bewegungszustand bei Haustür selbst überprüfen");
-            if (HaustuerBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
-            {
-                StateMachine.ExecuteAction(Signal.GotoAction);
-            }
-            else if (HaustuerBewegung.Status == false && GarderobeBewegung.Status == false && StateMachine.CurrentState == State.Action)
-            {
-                StateMachine.ExecuteAction(Signal.GotoReadyForAction);                
-            }
+                Console.WriteLine("Bewegungszustand bei Haustür selbst überprüfen");
+                if (HaustuerBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoAction);
+                    return;
+                }
+                else if (HaustuerBewegung.Status == false && GarderobeBewegung.Status == false && StateMachine.CurrentState == State.Action)
+                {
+                    StateMachine.ExecuteAction(Signal.GotoReadyForAction);
+                    return;
+                }
 
 
-            Console.WriteLine("Garderobe lichtsteuerung abgearbeitet, neuer Status: {0}", StateMachine.CurrentState);
+                Console.WriteLine("Garderobe lichtsteuerung abgearbeitet ohne return,  Status: {0}", StateMachine.CurrentState);
+            }
         }
 
 
-        public void RaiseDataChange(string source)
-        //protected virtual void OnProcessCompleted(SensorBool sensorBool)
-        {
-            DataChange?.Invoke(this, source);
-        }
+      
 
         private void DoDataChange(object sender, Objekt source)
         {

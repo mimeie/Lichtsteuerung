@@ -21,7 +21,7 @@ namespace Lichtsteuerung
         public StateMachineLogic StateMachine;
 
         //objekte
-        public Bewegungsmelder Ankleide; //theoretisch nicht nötig
+        //public Bewegungsmelder Ankleide; //theoretisch nicht nötig
         public SensorBool AnkleideBewegung;
         public SensorHelligkeit AnkleideHelligkeit;
 
@@ -37,9 +37,9 @@ namespace Lichtsteuerung
             AnkleideBewegung.MinLaufzeitMinutes = 4;
             AnkleideHelligkeit = new SensorHelligkeit("zigbee.0.00158d00063a6d54.illuminance", 50);
 
-            Ankleide = new Bewegungsmelder();
-            Ankleide.Bewegung = AnkleideBewegung;
-            Ankleide.Helligkeit = AnkleideHelligkeit;
+            //Ankleide = new Bewegungsmelder();
+            //Ankleide.Bewegung = AnkleideBewegung;
+            //Ankleide.Helligkeit = AnkleideHelligkeit;
 
             AnkleideTuer = new SensorBool("zigbee.0.00158d00025d978b.contact"); //zigbee.0.00158d00025d978b.contact 0_userdata.0.debugBool2
 
