@@ -41,6 +41,7 @@ namespace Lichtsteuerung
             //Garderobe.Bewegung = GarderobeBewegung;
             //Garderobe.Helligkeit = GarderobeHelligkeit;
 
+
            
 
             LichtGarderobe = new LampeHelligkeit("", "", "zwave2.0.Node_034.Multilevel_Switch.targetValue", "zwave2.0.Node_034.Multilevel_Switch.targetValue");
