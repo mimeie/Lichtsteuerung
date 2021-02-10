@@ -130,6 +130,7 @@ namespace Lichtsteuerung
         }
 
         //todo: status des lichts wird nicht geprüft fragt
+        //bug: helligkeit event kommt sofort nach tür und schliesst wieder weil der bewegungssensor noch nicht da ist.
         private void LichtsteuerungLogik()          
         {
             lock (logikLock)
