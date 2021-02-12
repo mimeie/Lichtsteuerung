@@ -11,9 +11,13 @@ namespace LichtsteuerungTest
         public void TestMethod1()
         {
             try
-            { 
-            SteuerungLogic.Instance.Start();
+            {
+                SteuerungLogic.Instance.IsDebug = true; //kann ganz am anfang aktiviert werden
+                SteuerungLogic.Instance.Start(); //führt dann den konstruktor aus
+                
+
             bool zuhause = SteuerungLogic.Instance.JemandZuhause.Status;
+            bool debug = SteuerungLogic.Instance.IsDebug ;
             }
             catch (Exception ex)
             {

@@ -14,6 +14,7 @@ namespace Lichtsteuerung
         private static volatile SteuerungLogic _instance;
         private static object _syncRoot = new object();
 
+        public bool IsDebug;
 
 
         public SensorBool JemandZuhause; //master
