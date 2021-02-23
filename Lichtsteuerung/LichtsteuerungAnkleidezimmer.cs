@@ -95,13 +95,10 @@ namespace Lichtsteuerung
             AnkleideBewegung.DataChange += DoDataChange;
             AnkleideHelligkeit.DataChange += DoDataChange;
             AnkleideTuer.DataChange += DoDataChange;
+            LichtAnkleide.DataChange += DoDataChange;
             SteuerungLogic.Instance.JemandZuhause.DataChange += DoDataChange;
 
             Console.WriteLine("updates der anlage geholt");
-
-            
-
-            LichtsteuerungLogik();
 
         }
 
@@ -143,79 +140,109 @@ namespace Lichtsteuerung
             }
         }
 
+        private void LichtsteuerungLogikAllOthers(Objekt source)
+        {
+            if (source != SteuerungLogic.Instance.JemandZuhause)
+            { 
+                LichtsteuerungLogik(SteuerungLogic.Instance.JemandZuhause);
+            }
+            if (source != AnkleideHelligkeit)
+            {
+                LichtsteuerungLogik(AnkleideHelligkeit);
+            }
+            if (source != AnkleideBewegung)
+            {
+                LichtsteuerungLogik(AnkleideBewegung);
+            }
+            if (source != AnkleideTuer)
+            {
+                LichtsteuerungLogik(AnkleideTuer);
+            }
+                                   
+        }
+
         //todo: status des lichts wird nicht geprüft fragt
         //bug: helligkeit event kommt sofort nach tür und schliesst wieder weil der bewegungssensor noch nicht da ist.
-        private void LichtsteuerungLogik()          
+        private void LichtsteuerungLogik(Objekt source)          
         {
             lock (logikLock)
-            {
-                Console.WriteLine("Ankleide Lichtsteuerung abarbeiten, aktueller Status: {0}, Zuhause: {1}, Bewegung: {2}, helligkeit: {3}, Tür: {4}, Licht Status: {5}", StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status, AnkleideBewegung.Status, AnkleideHelligkeit.Helligkeit, AnkleideTuer.Status, LichtAnkleide.Status);
-                if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
-                {
-                    StateMachine.ExecuteAction(Signal.GotoDeaktiviert);
-                    return;
-                }
-                else if (SteuerungLogic.Instance.JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
-                {
-                    StateMachine.ExecuteAction(Signal.GotoAus);
-                }
+            {                
+                Console.WriteLine("Ankleide Lichtsteuerung abarbeiten, aktueller Status: {0}, Zuhause: {1}, Bewegung: {2}, helligkeit: {3}, Tür: {4}, Licht Status: {5}, source-id: {6}", StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status, AnkleideBewegung.Status, AnkleideHelligkeit.Helligkeit, AnkleideTuer.Status, LichtAnkleide.Status, source.ObjektId);
 
-                Console.WriteLine("Helligkeit überprüfen");
-                if (StateMachine.CurrentState == State.Aus && AnkleideHelligkeit.Helligkeit < AnkleideHelligkeit.Abschaltlevel)
+                if (source == SteuerungLogic.Instance.JemandZuhause)
                 {
-                    StateMachine.ExecuteAction(Signal.GotoReadyForAction);
-                }
-                else if (AnkleideHelligkeit.Helligkeit > AnkleideHelligkeit.Abschaltlevel)
-                {
-                    StateMachine.ExecuteAction(Signal.GotoAus);
-                    return;
-                }
-
-
-
-                Console.WriteLine("Bewegungszustand überprüfen");
-                if (AnkleideBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
-                {
-                    StateMachine.ExecuteAction(Signal.GotoAction);
-                    return;
-                }
-                else if (AnkleideBewegung.Status == false && StateMachine.CurrentState == State.Action)
-                {
-                    //erst nach Ablauf der Restlaufzeit gehen
-                    if (AnkleideBewegung.HasRestlaufzeit(AnkleideBewegung.LastChangeTrue) == false)
+                    if (SteuerungLogic.Instance.JemandZuhause.Status == false && StateMachine.CurrentState != State.Deaktiviert)
                     {
-                        Console.WriteLine("Licht kann wieder ausgeschaltet werden, keine Restlaufzeit");
+                        StateMachine.ExecuteAction(Signal.GotoDeaktiviert);                        
+                    }
+                    else if (SteuerungLogic.Instance.JemandZuhause.Status == true && StateMachine.CurrentState == State.Deaktiviert)
+                    {
+                        StateMachine.ExecuteAction(Signal.GotoAus);
+                        
+                    }
+                    LichtsteuerungLogikAllOthers(source);
+                }
+
+
+                if (source == AnkleideHelligkeit)
+                {
+                    Console.WriteLine("Helligkeit überprüfen");
+                    if (StateMachine.CurrentState == State.Aus && AnkleideHelligkeit.Helligkeit < AnkleideHelligkeit.Abschaltlevel)
+                    {
                         StateMachine.ExecuteAction(Signal.GotoReadyForAction);
                     }
-                    else
+                    else if (AnkleideHelligkeit.Helligkeit > AnkleideHelligkeit.Abschaltlevel)
                     {
-                        Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue));
-                        Task.Delay(TimeSpan.FromMinutes(AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik());
-                        Console.WriteLine("späteres ausschalten getriggert");
-
+                        StateMachine.ExecuteAction(Signal.GotoAus);
+                        
+                        Console.WriteLine("Licht aus weil es zu Hell wird");
                     }
-                    return;
-                    //https://stackoverflow.com/questions/545533/delayed-function-calls
-
-
-
                 }
 
 
-                Console.WriteLine("Tür überprüfen");
-                if (AnkleideTuer.Status == false && StateMachine.CurrentState == State.ReadyForAction)
+                if (source == AnkleideBewegung)
                 {
-                    StateMachine.ExecuteAction(Signal.GotoAction);
-                    return;
-                }
-                else if (AnkleideTuer.Status == true && AnkleideBewegung.Status == false && StateMachine.CurrentState == State.Action)
-                {
-                    Console.WriteLine("Tür war nur kurz offen");
-                    StateMachine.ExecuteAction(Signal.GotoReadyForAction);
-                    return;
+                    Console.WriteLine("Bewegungszustand überprüfen");
+                    if (AnkleideBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
+                    {
+                        StateMachine.ExecuteAction(Signal.GotoAction);                       
+                    }
+                    else if (AnkleideBewegung.Status == false && StateMachine.CurrentState == State.Action)
+                    {
+                        //erst nach Ablauf der Restlaufzeit gehen
+                        if (AnkleideBewegung.HasRestlaufzeit(AnkleideBewegung.LastChangeTrue) == false)
+                        {
+                            Console.WriteLine("Licht kann wieder ausgeschaltet werden, keine Restlaufzeit");
+                            StateMachine.ExecuteAction(Signal.GotoReadyForAction);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue));
+                            Task.Delay(TimeSpan.FromMinutes(AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik(AnkleideBewegung));
+                            Console.WriteLine("späteres ausschalten getriggert");
+
+                        }                        
+                        //https://stackoverflow.com/questions/545533/delayed-function-calls
+                    }
                 }
 
-                Console.WriteLine("Ankleide lichtsteuerung abgearbeitet ohne return, Status: {0}", StateMachine.CurrentState);
+                if (source == AnkleideTuer)
+                {
+                    Console.WriteLine("Tür überprüfen");
+                    if (AnkleideTuer.Status == false && StateMachine.CurrentState == State.ReadyForAction)
+                    {
+                        StateMachine.ExecuteAction(Signal.GotoAction);
+                        
+                    }
+                    else if (AnkleideTuer.Status == true && AnkleideBewegung.Status == false && StateMachine.CurrentState == State.Action)
+                    {
+                        Console.WriteLine("Tür war nur kurz offen");
+                        StateMachine.ExecuteAction(Signal.GotoReadyForAction);
+                       
+                    }
+                }
+
+                Console.WriteLine("Ankleide lichtsteuerung abgearbeitet, Status: {0}", StateMachine.CurrentState);
             }
         }
 
@@ -225,7 +252,7 @@ namespace Lichtsteuerung
         {
             Console.WriteLine("DataChange für ankleidezimmer : {0}", source);
 
-            LichtsteuerungLogik();
+            LichtsteuerungLogik(source);
 
            
 

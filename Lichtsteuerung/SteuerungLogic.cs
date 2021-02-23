@@ -61,8 +61,15 @@ namespace Lichtsteuerung
             LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
             LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
 
-
-            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
+            if (IsDebug == false)
+            {
+                JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
+            }
+            else
+            {
+                JemandZuhause = new SensorBool("0_userdata.0.DebugIsAnybodyHome");
+            }
+            
             //braucht es im moment nicht JemandZuhause.DataChange += DoDataChange; 
 
             Console.WriteLine("Steuerung starten");
