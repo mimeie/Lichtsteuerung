@@ -33,18 +33,32 @@ namespace Lichtsteuerung
 
         public LichtsteuerungAnkleidezimmer()
         {
-            AnkleideBewegung = new SensorBool("zigbee.0.00158d00063a6d54.occupancy"); //zigbee.0.00158d00063a6d54.occupancy 0_userdata.0.debugBool
-            AnkleideBewegung.MinLaufzeitMinutes = 4;
-            AnkleideHelligkeit = new SensorHelligkeit("zigbee.0.00158d00063a6d54.illuminance", 50);
+
+            if (SteuerungLogic.Instance.IsDebug == false)
+            {
+                AnkleideBewegung = new SensorBool("zigbee.0.00158d00063a6d54.occupancy");
+                AnkleideBewegung.MinLaufzeitMinutes = 4;
+                AnkleideHelligkeit = new SensorHelligkeit("zigbee.0.00158d00063a6d54.illuminance", 50);
+
+                AnkleideTuer = new SensorBool("zigbee.0.00158d00025d978b.contact");
+
+                LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");
+            }
+            else
+            {
+                AnkleideBewegung = new SensorBool("0_userdata.0.DebugLichtsteuerung.Bewegung");
+                AnkleideBewegung.MinLaufzeitMinutes = 4;
+                AnkleideHelligkeit = new SensorHelligkeit("0_userdata.0.DebugLichtsteuerung.Helligkeit", 50);
+
+                AnkleideTuer = new SensorBool("0_userdata.0.DebugLichtsteuerung.TuerKontakt");
+
+                LichtAnkleide = new Schalter("0_userdata.0.DebugLichtsteuerung.LichtSchalter");
+            }
+          
 
             //Ankleide = new Bewegungsmelder();
             //Ankleide.Bewegung = AnkleideBewegung;
             //Ankleide.Helligkeit = AnkleideHelligkeit;
-
-            AnkleideTuer = new SensorBool("zigbee.0.00158d00025d978b.contact"); //zigbee.0.00158d00025d978b.contact 0_userdata.0.debugBool2
-
-            LichtAnkleide = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch");           
-                
 
 
             //StateMachine init

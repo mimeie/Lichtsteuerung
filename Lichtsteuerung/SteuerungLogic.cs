@@ -14,8 +14,8 @@ namespace Lichtsteuerung
         private static volatile SteuerungLogic _instance;
         private static object _syncRoot = new object();
 
-        public bool IsDebug;
 
+        public bool IsDebug;
 
         public SensorBool JemandZuhause; //master
         //master2
@@ -30,19 +30,7 @@ namespace Lichtsteuerung
 
         private SteuerungLogic()
         {
-
-            
-
-
-            LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
-            LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
-
-
-            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
-            //braucht es im moment nicht JemandZuhause.DataChange += DoDataChange; 
-
-
-
+                  
         }
 
      
@@ -69,6 +57,14 @@ namespace Lichtsteuerung
 
         public void Start()
         {
+            Console.WriteLine("Steuerungsobjekte initieren");
+            LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
+            LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
+
+
+            JemandZuhause = new SensorBool("0_userdata.0.IsAnybodyHome");
+            //braucht es im moment nicht JemandZuhause.DataChange += DoDataChange; 
+
             Console.WriteLine("Steuerung starten");
 
             JemandZuhause.Update();
