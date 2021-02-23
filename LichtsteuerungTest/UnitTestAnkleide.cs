@@ -5,18 +5,24 @@ using System;
 namespace LichtsteuerungTest
 {
     [TestClass]
-    public class UnitTest1
+    public class UnitTestAnkleide
     {
+
+        private void Initialize()
+        {
+            SteuerungLogic.Instance.IsDebug = true; //kann ganz am anfang aktiviert werden
+            SteuerungLogic.Instance.Start(); //führt dann den konstruktor aus
+        }
+
         [TestMethod]
-        public void TestMethod1()
+        public void AnkleideStandard()
         {
             try
             {
-                SteuerungLogic.Instance.IsDebug = true; //kann ganz am anfang aktiviert werden
-                SteuerungLogic.Instance.Start(); //führt dann den konstruktor aus
-                
+                Initialize();
 
-            bool zuhause = SteuerungLogic.Instance.JemandZuhause.Status;
+
+                bool zuhause = SteuerungLogic.Instance.JemandZuhause.Status;
             bool debug = SteuerungLogic.Instance.IsDebug ;
             }
             catch (Exception ex)
