@@ -22,8 +22,11 @@ namespace LichtsteuerungTest
                 Initialize();
 
 
+                bool bewegung = SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.Status;
+                string debug = SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.LichtAnkleide.ObjektId;
+
                 bool zuhause = SteuerungLogic.Instance.JemandZuhause.Status;
-            bool debug = SteuerungLogic.Instance.IsDebug ;
+           
             }
             catch (Exception ex)
             {
