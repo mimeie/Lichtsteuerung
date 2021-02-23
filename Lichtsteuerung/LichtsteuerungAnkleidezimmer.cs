@@ -100,6 +100,8 @@ namespace Lichtsteuerung
 
             Console.WriteLine("updates der anlage geholt");
 
+            LichtsteuerungLogikAllOthers(SteuerungLogic.Instance.JemandZuhause);
+
         }
 
         private void GotoStateAus()
