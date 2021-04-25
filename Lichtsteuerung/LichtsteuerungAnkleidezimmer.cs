@@ -163,8 +163,7 @@ namespace Lichtsteuerung
                                    
         }
 
-        //todo: status des lichts wird nicht geprüft fragt
-        //bug: helligkeit event kommt sofort nach tür und schliesst wieder weil der bewegungssensor noch nicht da ist.
+        
         private void LichtsteuerungLogik(Objekt source)          
         {
             lock (logikLock)
@@ -219,12 +218,13 @@ namespace Lichtsteuerung
                         }
                         else
                         {
+                            //https://stackoverflow.com/questions/545533/delayed-function-calls
                             Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue));
                             Task.Delay(TimeSpan.FromMinutes(AnkleideBewegung.RestlaufzeitMinutes(AnkleideBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik(AnkleideBewegung));
                             Console.WriteLine("späteres ausschalten getriggert");
 
                         }                        
-                        //https://stackoverflow.com/questions/545533/delayed-function-calls
+                        
                     }
                 }
 

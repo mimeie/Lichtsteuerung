@@ -24,7 +24,7 @@ namespace Lichtsteuerung
         //Sublogiken
         public LichtsteuerungAnkleidezimmer LichtsteuerungAnkleidezimmer;
         public LichtsteuerungGarderobe LichtsteuerungGarderobe;
-
+        public LichtsteuerungSpielzimmer LichtsteuerungSpielzimmer;
 
 
 
@@ -60,6 +60,7 @@ namespace Lichtsteuerung
             Console.WriteLine("Steuerungsobjekte initieren");
             LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
             LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
+            LichtsteuerungSpielzimmer = new LichtsteuerungSpielzimmer();
 
             if (IsDebug == false)
             {
@@ -78,7 +79,7 @@ namespace Lichtsteuerung
 
             LichtsteuerungAnkleidezimmer.Initialize();
             LichtsteuerungGarderobe.Initialize();
-
+            LichtsteuerungSpielzimmer.Initialize();
 
 
             Console.WriteLine("JobManager wurde initialisiert");

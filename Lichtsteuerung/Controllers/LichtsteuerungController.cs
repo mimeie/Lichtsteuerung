@@ -112,8 +112,22 @@ namespace Lichtsteuerung
                                 case "HaustuerBewegung":
                                     SteuerungLogic.Instance.LichtsteuerungGarderobe.HaustuerBewegung.RaiseDataChange(true);
                                     break;
+                                case "GarageTuer":
+                                    SteuerungLogic.Instance.LichtsteuerungGarderobe.GarageTuer.RaiseDataChange(true);
+                                    break;                                   
+                            }                            
+                            break;
+                        case "lichtspielzimmer":
+                            switch (source)
+                            {
+                                case "SpielzimmerBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.SpielzimmerBewegung.RaiseDataChange(true);
+                                    break;
+                                case "LichtSpielzimmer":
+                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.LichtSpielzimmer.RaiseDataChange(true);
+                                    break;     
                             }
-                            
+
                             break;
                         case "allgemein":
                             SteuerungLogic.Instance.JemandZuhause.RaiseDataChange(true);
