@@ -26,6 +26,7 @@ namespace Lichtsteuerung
                 SpielzimmerBewegung.MinLaufzeitMinutes = 8;
 
                 LichtSpielzimmer = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay1.Switch");
+                //LichtSpielzimmer.MinLaufzeitMinutes = SpielzimmerBewegung.MinLaufzeitMinutes;
             }
             else
             {
@@ -33,6 +34,7 @@ namespace Lichtsteuerung
                 SpielzimmerBewegung.MinLaufzeitMinutes = 0.5;
 
                 LichtSpielzimmer = new Schalter("0_userdata.0.DebugLichtsteuerung.LichtSchalter");
+                //LichtSpielzimmer.MinLaufzeitMinutes = SpielzimmerBewegung.MinLaufzeitMinutes;
             }
 
 
@@ -166,12 +168,12 @@ namespace Lichtsteuerung
                     {
                         StateMachine.ExecuteAction(Signal.GotoAction);
                         //falls es nie eine bewegung gibt, licht mit maximaler dauer laufen lassen
-                        Task.Delay(TimeSpan.FromMinutes(SpielzimmerBewegung.MinLaufzeitMinutes)).ContinueWith(t => LichtsteuerungLogik(SpielzimmerBewegung));
-                        Console.WriteLine("späteres ausschalten getriggert");
+                        SpielzimmerBewegung.LastChangeTrue = DateTime.Now;
+                        Console.WriteLine("laufzeit manuell gesetzt beim starten");
                     }
                     else if (LichtSpielzimmer.Status == false && StateMachine.CurrentState != State.Deaktiviert)
                     {
-                        Console.WriteLine("Tür war nur kurz offen");
+                        Console.WriteLine("licht wurde wieder ausgeschaltet");
                         StateMachine.ExecuteAction(Signal.GotoAus);
 
                     }
