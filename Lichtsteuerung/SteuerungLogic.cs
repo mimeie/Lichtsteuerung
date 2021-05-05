@@ -24,9 +24,11 @@ namespace Lichtsteuerung
         //Sublogiken
         public LichtsteuerungAnkleidezimmer LichtsteuerungAnkleidezimmer;
         public LichtsteuerungGarderobe LichtsteuerungGarderobe;
-        public LichtsteuerungSpielzimmer LichtsteuerungSpielzimmer;
 
-
+        //automatisches ausschalten
+        public LichtsteuerungAutoAus LichtsteuerungSpielzimmer;
+        public LichtsteuerungAutoAus LichtsteuerungPhilomenaStehlampe;
+        
 
         private SteuerungLogic()
         {
@@ -60,7 +62,10 @@ namespace Lichtsteuerung
             Console.WriteLine("Steuerungsobjekte initieren");
             LichtsteuerungAnkleidezimmer = new LichtsteuerungAnkleidezimmer();
             LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
-            LichtsteuerungSpielzimmer = new LichtsteuerungSpielzimmer();
+
+            LichtsteuerungSpielzimmer = new LichtsteuerungAutoAus("LichtsteuerungSpielzimmer","zigbee.0.00158d0004abd3aa.occupancy", "shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay1.Switch",8);
+            LichtsteuerungPhilomenaStehlampe = new LichtsteuerungAutoAus("LichtsteuerungPhilomenaStehlampe", "zigbee.0.00158d000504e521.occupancy", "zigbee.0.588e81fffef59c5d.state", 15);
+
 
             if (IsDebug == false)
             {

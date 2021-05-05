@@ -121,14 +121,26 @@ namespace Lichtsteuerung
                             switch (source)
                             {
                                 case "SpielzimmerBewegung":
-                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.SpielzimmerBewegung.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.RaiseDataChange(true);
                                     break;
-                                case "LichtSpielzimmer":
-                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.LichtSpielzimmer.RaiseDataChange(true);
+                                case "SpielzimmerLicht":
+                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.RaiseDataChange(true);
                                     break;     
                             }
-
                             break;
+
+                        case "lichtstehlampephilomena":
+                            switch (source)
+                            {
+                                case "PhilomenaStehlampeBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungPhilomenaStehlampe.ZimmerBewegung.RaiseDataChange(true);
+                                    break;
+                                case "PhilomenaStehlampeLicht":
+                                    SteuerungLogic.Instance.LichtsteuerungPhilomenaStehlampe.ZimmerLicht.RaiseDataChange(true);
+                                    break;
+                            }
+                            break;
+
                         case "allgemein":
                             SteuerungLogic.Instance.JemandZuhause.RaiseDataChange(true);
                             break;
