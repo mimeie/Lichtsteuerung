@@ -22,7 +22,7 @@ namespace Lichtsteuerung
         {
             if (SteuerungLogic.Instance.IsDebug == false)
             {
-                SpielzimmerBewegung = new SensorBool("zigbee.0.00158d00063a6d54.occupancy");
+                SpielzimmerBewegung = new SensorBool("zigbee.0.00158d0004abd3aa.occupancy");
                 SpielzimmerBewegung.MinLaufzeitMinutes = 8;
 
                 LichtSpielzimmer = new Schalter("shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay1.Switch");
