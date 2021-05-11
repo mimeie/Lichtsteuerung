@@ -22,8 +22,8 @@ namespace LichtsteuerungTest
         {
             //Werte auf Standard retoursetzen damit die Tests immer gleich laufen
             SteuerungLogic.Instance.JemandZuhause.DebugSetStatus(false);
-            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.DebugSetStatus(false);         
-            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.ZielStatus = false;
+            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumBewegung.DebugSetStatus(false);         
+            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumLicht.ZielStatus = false;
         }
 
         private void JemandZuhauseAktivieren()
@@ -39,8 +39,8 @@ namespace LichtsteuerungTest
         private void StandardEinschalten()
         {
             //licht schaltet ein
-            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.ZielStatus = true;
-            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.RaiseDataChange(true);
+            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumLicht.ZielStatus = true;
+            SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumLicht.RaiseDataChange(true);
             if (SteuerungLogic.Instance.LichtsteuerungSpielzimmer.StateMachine.CurrentState != JusiBase.State.Action)
             {
                 Console.WriteLine("Fehler bei Standard, müsste auf Action sein");
@@ -60,8 +60,8 @@ namespace LichtsteuerungTest
                 StandardEinschalten();
 
                 //nun wieder aussschalten, dafür restlaufzeit min übersteuern
-                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.ZielStatus = false;
-                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumLicht.ZielStatus = false;
+                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumLicht.RaiseDataChange(true);
                 if (SteuerungLogic.Instance.LichtsteuerungSpielzimmer.StateMachine.CurrentState != JusiBase.State.Aus)
                 {
                     Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Aus sein");
@@ -87,8 +87,8 @@ namespace LichtsteuerungTest
 
 
                            
-                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.DebugSetStatus(true);
-                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumBewegung.DebugSetStatus(true);
+                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumBewegung.RaiseDataChange(true);
 
                 if (SteuerungLogic.Instance.LichtsteuerungSpielzimmer.StateMachine.CurrentState != JusiBase.State.Action)
                 {
@@ -97,8 +97,8 @@ namespace LichtsteuerungTest
 
                 Thread.Sleep(10000);
 
-                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.DebugSetStatus(false);
-                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumBewegung.DebugSetStatus(false);
+                SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumBewegung.RaiseDataChange(true);
 
                 if (SteuerungLogic.Instance.LichtsteuerungSpielzimmer.StateMachine.CurrentState != JusiBase.State.Action)
                 {

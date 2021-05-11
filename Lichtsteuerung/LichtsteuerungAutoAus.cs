@@ -14,30 +14,31 @@ namespace Lichtsteuerung
         //für die state machine
         public StateMachineLogic StateMachine;
 
-        public SensorBool ZimmerBewegung; //ist ein inttobool, dass die aotec sensoren gleich auch mitgenutzt werden können
+        public SensorBool RaumBewegung;
 
-        public Schalter ZimmerLicht;
 
-        private string _zimmerName;
+        public Schalter RaumLicht;
 
-        public LichtsteuerungAutoAus(string zimmerName, string bewegungId, string schalterId, double minLaufzeit)
+        private string _RaumName;
+
+        public LichtsteuerungAutoAus(string RaumName, string bewegungId, SourceType bewegungSource, string schalterId, double minLaufzeit)
         {
-            _zimmerName=zimmerName; 
+            _RaumName=RaumName; 
             if (SteuerungLogic.Instance.IsDebug == false)
             {
-                ZimmerBewegung = new SensorBool(bewegungId);
-                ZimmerBewegung.MinLaufzeitMinutes = minLaufzeit;
+                RaumBewegung = new SensorBool(bewegungId, bewegungSource);
+                RaumBewegung.MinLaufzeitMinutes = minLaufzeit;
 
-                ZimmerLicht = new Schalter(schalterId);
-                //LichtSpielzimmer.MinLaufzeitMinutes = SpielzimmerBewegung.MinLaufzeitMinutes;
+                RaumLicht = new Schalter(schalterId);
+                //LichtSpielRaum.MinLaufzeitMinutes = SpielRaumBewegung.MinLaufzeitMinutes;
             }
             else
             {
-                ZimmerBewegung = new SensorBool("0_userdata.0.DebugLichtsteuerung.Bewegung");
-                ZimmerBewegung.MinLaufzeitMinutes = 0.5;
+                RaumBewegung = new SensorBool("0_userdata.0.DebugLichtsteuerung.Bewegung");
+                RaumBewegung.MinLaufzeitMinutes = 0.5;
 
-                ZimmerLicht = new Schalter("0_userdata.0.DebugLichtsteuerung.LichtSchalter");
-                //LichtSpielzimmer.MinLaufzeitMinutes = SpielzimmerBewegung.MinLaufzeitMinutes;
+                RaumLicht = new Schalter("0_userdata.0.DebugLichtsteuerung.LichtSchalter");
+                //LichtSpielRaum.MinLaufzeitMinutes = SpielRaumBewegung.MinLaufzeitMinutes;
             }
 
 
@@ -66,11 +67,11 @@ namespace Lichtsteuerung
         {
 
             Console.WriteLine("updates der anlage holen");
-            ZimmerBewegung.Update();
-            ZimmerLicht.Update();
+            RaumBewegung.Update();
+            RaumLicht.Update();
 
-            ZimmerBewegung.DataChange += DoDataChange;
-            ZimmerLicht.DataChange += DoDataChange;
+            RaumBewegung.DataChange += DoDataChange;
+            RaumLicht.DataChange += DoDataChange;
             SteuerungLogic.Instance.JemandZuhause.DataChange += DoDataChange;
 
             Console.WriteLine("updates der anlage geholt");
@@ -81,7 +82,7 @@ namespace Lichtsteuerung
 
         private void DoDataChange(object sender, Objekt source)
         {
-            Console.WriteLine("DataChange für spielzimmer : {0}", source);
+            Console.WriteLine("DataChange für spielRaum : {0}", source);
 
             LichtsteuerungLogik(source);
 
@@ -92,9 +93,9 @@ namespace Lichtsteuerung
         private void GotoStateAus()
         {
             Console.WriteLine("Executed: GotoStateAus");
-            if (ZimmerLicht.Status == true)
+            if (RaumLicht.Status == true)
             {
-                ZimmerLicht.ZielStatus = false;
+                RaumLicht.ZielStatus = false;
             }
 
         }
@@ -102,9 +103,9 @@ namespace Lichtsteuerung
         private void GotoStateDeaktiviert()
         {
             Console.WriteLine("Executed: GotoStateDeaktiviert");
-            if (ZimmerLicht.Status == true)
+            if (RaumLicht.Status == true)
             {
-                ZimmerLicht.ZielStatus = false;
+                RaumLicht.ZielStatus = false;
             }
 
         }
@@ -112,18 +113,18 @@ namespace Lichtsteuerung
         private void GotoStateAction()
         {
             Console.WriteLine("Executed: GotoStateAction");
-            //if (LichtSpielzimmer.Status == false)
+            //if (LichtSpielRaum.Status == false)
             //{
-            //    LichtSpielzimmer.ZielStatus = true;
+            //    LichtSpielRaum.ZielStatus = true;
             //}
         }
 
         //private void GotoStateReadyForAction()
         //{
         //    Console.WriteLine("Executed: GotoStateReadyForAction");
-        //    if (LichtSpielzimmer.Status == true)
+        //    if (LichtSpielRaum.Status == true)
         //    {
-        //        LichtSpielzimmer.ZielStatus = false;
+        //        LichtSpielRaum.ZielStatus = false;
         //    }
         //}
 
@@ -133,13 +134,13 @@ namespace Lichtsteuerung
             {
                 LichtsteuerungLogik(SteuerungLogic.Instance.JemandZuhause);
             }            
-            if (source != ZimmerBewegung)
+            if (source != RaumBewegung)
             {
-                LichtsteuerungLogik(ZimmerBewegung);
+                LichtsteuerungLogik(RaumBewegung);
             }
-            if (source != ZimmerLicht)
+            if (source != RaumLicht)
             {
-                LichtsteuerungLogik(ZimmerLicht);
+                LichtsteuerungLogik(RaumLicht);
             }
 
         }
@@ -148,7 +149,7 @@ namespace Lichtsteuerung
         {
             lock (logikLock)
             {
-                Console.WriteLine("{0} abarbeiten, aktueller Status: {1}, Zuhause: {2}, Bewegung: {3}, Licht Status: {4}", _zimmerName, StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status,ZimmerBewegung.Status, ZimmerLicht.Status);
+                Console.WriteLine("{0} abarbeiten, aktueller Status: {1}, Zuhause: {2}, Bewegung: {3}, Licht Status: {4}", _RaumName, StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status,RaumBewegung.Status, RaumLicht.Status);
 
                 string test = this.GetType().Name;
                 if (source == SteuerungLogic.Instance.JemandZuhause)
@@ -165,17 +166,17 @@ namespace Lichtsteuerung
                     LichtsteuerungLogikAllOthers(source);
                 }
 
-                if (source == ZimmerLicht)
+                if (source == RaumLicht)
                 {
                     Console.WriteLine("Licht überprüfen");
-                    if (ZimmerLicht.Status == true && StateMachine.CurrentState != State.Deaktiviert)
+                    if (RaumLicht.Status == true && StateMachine.CurrentState != State.Deaktiviert)
                     {
                         StateMachine.ExecuteAction(Signal.GotoAction);
                         //falls es nie eine bewegung gibt, licht mit maximaler dauer laufen lassen
-                        ZimmerBewegung.LastChangeTrue = DateTime.Now;
+                        RaumBewegung.LastChangeTrue = DateTime.Now;
                         Console.WriteLine("laufzeit manuell gesetzt beim starten");
                     }
-                    else if (ZimmerLicht.Status == false && StateMachine.CurrentState != State.Deaktiviert)
+                    else if (RaumLicht.Status == false && StateMachine.CurrentState != State.Deaktiviert)
                     {
                         Console.WriteLine("licht wurde wieder ausgeschaltet");
                         StateMachine.ExecuteAction(Signal.GotoAus);
@@ -183,13 +184,13 @@ namespace Lichtsteuerung
                     }
                 }
 
-                if (source == ZimmerBewegung)
+                if (source == RaumBewegung)
                 {
                     Console.WriteLine("Bewegungszustand überprüfen");
-                    if (ZimmerBewegung.Status == false && StateMachine.CurrentState == State.Action)
+                    if (RaumBewegung.Status == false && StateMachine.CurrentState == State.Action)
                     {
                         //erst nach Ablauf der Restlaufzeit gehen
-                        if (ZimmerBewegung.HasRestlaufzeit(ZimmerBewegung.LastChangeTrue) == false)
+                        if (RaumBewegung.HasRestlaufzeit(RaumBewegung.LastChangeTrue) == false)
                         {
                             Console.WriteLine("Licht kann wieder ausgeschaltet werden, keine Restlaufzeit");
                             StateMachine.ExecuteAction(Signal.GotoAus);
@@ -197,8 +198,8 @@ namespace Lichtsteuerung
                         else
                         {
                             //https://stackoverflow.com/questions/545533/delayed-function-calls
-                            Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", ZimmerBewegung.RestlaufzeitMinutes(ZimmerBewegung.LastChangeTrue));
-                            Task.Delay(TimeSpan.FromMinutes(ZimmerBewegung.RestlaufzeitMinutes(ZimmerBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik(ZimmerBewegung));
+                            Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", RaumBewegung.RestlaufzeitMinutes(RaumBewegung.LastChangeTrue));
+                            Task.Delay(TimeSpan.FromMinutes(RaumBewegung.RestlaufzeitMinutes(RaumBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik(RaumBewegung));
                             Console.WriteLine("späteres ausschalten getriggert");
 
                         }
@@ -206,7 +207,7 @@ namespace Lichtsteuerung
                     }
                 }
             }
-            Console.WriteLine("Zimmer lichtsteuerung abgearbeitet, Status: {0}", StateMachine.CurrentState);
+            Console.WriteLine("Raum lichtsteuerung abgearbeitet, Status: {0}", StateMachine.CurrentState);
 
         }
 

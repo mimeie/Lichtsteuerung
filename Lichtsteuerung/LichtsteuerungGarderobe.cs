@@ -24,7 +24,7 @@ namespace Lichtsteuerung
         public SensorBool GarderobeBewegung;
         public SensorHelligkeit GarderobeHelligkeit;
 
-        public SensorIntToBool HaustuerBewegung;
+        public SensorBool HaustuerBewegung;
 
         public LampeHelligkeit LichtGarderobe;
 
@@ -39,7 +39,7 @@ namespace Lichtsteuerung
                 GarderobeBewegung = new SensorBool("zigbee.0.00158d00057f826b.occupancy");
                 GarderobeBewegung.MinLaufzeitMinutes = 5;
                 GarderobeHelligkeit = new SensorHelligkeit("zigbee.0.00158d00057f826b.illuminance", 70);
-                HaustuerBewegung = new SensorIntToBool("zwave2.0.Node_023.Basic.currentValue");
+                HaustuerBewegung = new SensorBool("zwave2.0.Node_023.Basic.currentValue",SourceType.Integer);
 
                 GarageTuer = new SensorBool("zigbee.0.00158d00045b0885.contact");
             }
@@ -48,7 +48,7 @@ namespace Lichtsteuerung
                 GarderobeBewegung = new SensorBool("0_userdata.0.DebugLichtsteuerung.Bewegung");
                 GarderobeBewegung.MinLaufzeitMinutes = 4;
                 GarderobeHelligkeit = new SensorHelligkeit("0_userdata.0.DebugLichtsteuerung.Helligkeit", 50);
-                HaustuerBewegung = new SensorIntToBool("0_userdata.0.DebugLichtsteuerung.BewegungInt");
+                HaustuerBewegung = new SensorBool("0_userdata.0.DebugLichtsteuerung.BewegungInt",SourceType.Integer);
 
                 GarageTuer = new SensorBool("0_userdata.0.DebugLichtsteuerung.TuerKontakt");
             }

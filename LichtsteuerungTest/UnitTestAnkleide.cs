@@ -5,7 +5,7 @@ using System;
 namespace LichtsteuerungTest
 {
     [TestClass]
-    public class UnitTestAnkleide
+    public class UnitTestRaum
     {
 
         private void Initialize()
@@ -21,10 +21,10 @@ namespace LichtsteuerungTest
         {
             //Werte auf Standard retoursetzen damit die Tests immer gleich laufen
             SteuerungLogic.Instance.JemandZuhause.DebugSetStatus(false);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.DebugSetStatus(false);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideTuer.DebugSetStatus(true);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.DebugSetHelligkeit(10);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.LichtAnkleide.ZielStatus = false;
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.DebugSetStatus(false);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumTuer.DebugSetStatus(true);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.DebugSetHelligkeit(10);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumLicht.ZielStatus = false;
         }
 
         private void JemandZuhauseAktivieren()
@@ -33,39 +33,39 @@ namespace LichtsteuerungTest
             SteuerungLogic.Instance.JemandZuhause.RaiseDataChange(true);
             if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.ReadyForAction)
             {
-                Console.WriteLine("Fehler bei AnkleideStandard, müsste auf ReadyForAction sein");
+                Console.WriteLine("Fehler bei RaumStandard, müsste auf ReadyForAction sein");
             }
         }
 
         private void StandardEinschalten()
         {
             //tür öffnen
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideTuer.DebugSetStatus(false);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideTuer.RaiseDataChange(true);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumTuer.DebugSetStatus(false);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumTuer.RaiseDataChange(true);
             if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.Action)
             {
-                Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Action sein");
+                Console.WriteLine("Fehler bei RaumStandard, müsste auf Action sein");
             }
 
             //fehler provozieren, helligkeit verschiebt sich, licht darf nicht ausgeschaltet werden
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.DebugSetHelligkeit(8);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.RaiseDataChange(true);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.DebugSetHelligkeit(8);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.RaiseDataChange(true);
             if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.Action)
             {
-                Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Action sein");
+                Console.WriteLine("Fehler bei RaumStandard, müsste auf Action sein");
             }
 
             //nun kommt bewegung hinzu
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.DebugSetStatus(true);
-            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.RaiseDataChange(true);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.DebugSetStatus(true);
+            SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.RaiseDataChange(true);
             if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.Action)
             {
-                Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Action sein");
+                Console.WriteLine("Fehler bei RaumStandard, müsste auf Action sein");
             }
         }
 
         [TestMethod]
-        public void AnkleideLichtAusBewegung()
+        public void RaumLichtAusBewegung()
         {
 
            
@@ -77,12 +77,12 @@ namespace LichtsteuerungTest
                 StandardEinschalten();
 
                 //nun wieder aussschalten, dafür restlaufzeit min übersteuern
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.MinLaufzeitMinutes = 0;
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.DebugSetStatus(false);
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.MinLaufzeitMinutes = 0;
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.DebugSetStatus(false);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.RaiseDataChange(true);
                 if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.ReadyForAction)
                 {
-                    Console.WriteLine("Fehler bei AnkleideStandard, müsste auf ReadyForAction sein");
+                    Console.WriteLine("Fehler bei RaumStandard, müsste auf ReadyForAction sein");
                 }
 
             }
@@ -94,7 +94,7 @@ namespace LichtsteuerungTest
         }
 
         [TestMethod]
-        public void AnkleideLichtHelligkeit()
+        public void RaumLichtHelligkeit()
         {
             try
             {
@@ -104,11 +104,11 @@ namespace LichtsteuerungTest
 
 
                 //nun wieder aussschalten, dafür restlaufzeit min übersteuern
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.DebugSetHelligkeit(98);
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.DebugSetHelligkeit(98);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.RaiseDataChange(true);
                 if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.Aus)
                 {
-                    Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Aus sein");
+                    Console.WriteLine("Fehler bei RaumStandard, müsste auf Aus sein");
                 }
 
             }
@@ -120,7 +120,7 @@ namespace LichtsteuerungTest
         }
 
         [TestMethod]
-        public void AnkleideStatusHelligkeit()
+        public void RaumStatusHelligkeit()
         {
             try
             {
@@ -129,11 +129,11 @@ namespace LichtsteuerungTest
 
 
                 //nun wieder aussschalten, dafür restlaufzeit min übersteuern
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.DebugSetHelligkeit(98);
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.DebugSetHelligkeit(98);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.RaiseDataChange(true);
                 if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.Aus)
                 {
-                    Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Aus sein");
+                    Console.WriteLine("Fehler bei RaumStandard, müsste auf Aus sein");
                 }
 
             }
@@ -147,18 +147,18 @@ namespace LichtsteuerungTest
 
 
         [TestMethod]
-        public void AnkleideLichtManuell()
+        public void RaumLichtManuell()
         {
             try
             {
                 Initialize();
                 JemandZuhauseAktivieren();
 
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.LichtAnkleide.ZielStatus=true;
-                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.LichtAnkleide.RaiseDataChange(true);
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumLicht.ZielStatus=true;
+                SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumLicht.RaiseDataChange(true);
                 if (SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.StateMachine.CurrentState != JusiBase.State.Action)
                 {
-                    Console.WriteLine("Fehler bei AnkleideStandard, müsste auf Action bleiben");
+                    Console.WriteLine("Fehler bei RaumStandard, müsste auf Action bleiben");
                 }
             }
             catch (Exception ex)

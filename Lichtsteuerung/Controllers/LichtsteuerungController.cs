@@ -87,16 +87,16 @@ namespace Lichtsteuerung
                             switch (source)
                             {
                                 case "AnkleideBewegung":
-                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideBewegung.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumBewegung.RaiseDataChange(true);
                                     break;
                                 case "AnkleideHelligkeit":
-                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideHelligkeit.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.RaiseDataChange(true);
                                     break;
                                 case "AnkleideTuer":
-                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.AnkleideTuer.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumTuer.RaiseDataChange(true);
                                     break;
                                 case "LichtAnkleide":
-                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.LichtAnkleide.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumLicht.RaiseDataChange(true);
                                     break;
                             }                                                   
                             break;
@@ -121,10 +121,10 @@ namespace Lichtsteuerung
                             switch (source)
                             {
                                 case "SpielzimmerBewegung":
-                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerBewegung.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumBewegung.RaiseDataChange(true);
                                     break;
                                 case "SpielzimmerLicht":
-                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.ZimmerLicht.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungSpielzimmer.RaumLicht.RaiseDataChange(true);
                                     break;     
                             }
                             break;
@@ -133,10 +133,52 @@ namespace Lichtsteuerung
                             switch (source)
                             {
                                 case "PhilomenaStehlampeBewegung":
-                                    SteuerungLogic.Instance.LichtsteuerungPhilomenaStehlampe.ZimmerBewegung.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungPhilomenaStehlampe.RaumBewegung.RaiseDataChange(true);
                                     break;
                                 case "PhilomenaStehlampeLicht":
-                                    SteuerungLogic.Instance.LichtsteuerungPhilomenaStehlampe.ZimmerLicht.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungPhilomenaStehlampe.RaumBewegung.RaiseDataChange(true);
+                                    break;
+                            }
+                            break;
+
+                        case "lichtkueche":
+                            switch (source)
+                            {
+                                case "KuecheBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungKueche.RaumBewegung.RaiseDataChange(true);
+                                    break;
+                                case "KuecheLicht":
+                                    SteuerungLogic.Instance.LichtsteuerungKueche.RaumLicht.RaiseDataChange(true);
+                                    break;
+                            }
+                            break;
+
+                        case "lichtwohnzimmer":
+                            switch (source)
+                            {
+                                case "WohnzimmerBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungWohnzimmer.RaumBewegung.RaiseDataChange(true);
+                                    break;
+                                case "WohnzimmerLicht":
+                                    SteuerungLogic.Instance.LichtsteuerungWohnzimmer.RaumLicht.RaiseDataChange(true);
+                                    break;
+                            }
+                            break;
+
+                        case "lichtwaschraum":
+                            switch (source)
+                            {
+                                case "WaschraumBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumBewegung.RaiseDataChange(true);
+                                    break;
+                                case "WaschraumTuer":
+                                    SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumTuer.RaiseDataChange(true);
+                                    break;
+                                case "WaschraumLicht":
+                                    SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumLicht.RaiseDataChange(true);
+                                    break;
+                                case "WaschraumHelligkeit":
+                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.RaiseDataChange(true);
                                     break;
                             }
                             break;
