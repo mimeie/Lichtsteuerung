@@ -178,11 +178,25 @@ namespace Lichtsteuerung
                                     SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumLicht.RaiseDataChange(true);
                                     break;
                                 case "WaschraumHelligkeit":
-                                    SteuerungLogic.Instance.LichtsteuerungAnkleidezimmer.RaumHelligkeit.RaiseDataChange(true);
+                                    SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumHelligkeit.RaiseDataChange(true);
                                     break;
                             }
                             break;
 
+                        case "lichtkeller":
+                            switch (source)
+                            {
+                                case "KellerBewegung":
+                                    SteuerungLogic.Instance.LichtsteuerungKeller.RaumBewegung.RaiseDataChange(true);
+                                    break;                               
+                                case "KellerLicht":
+                                    SteuerungLogic.Instance.LichtsteuerungKeller.RaumLicht.RaiseDataChange(true);
+                                    break;
+                                case "KellerHelligkeit":
+                                    SteuerungLogic.Instance.LichtsteuerungKeller.RaumHelligkeit.RaiseDataChange(true);
+                                    break;
+                            }
+                            break;
                         case "allgemein":
                             SteuerungLogic.Instance.JemandZuhause.RaiseDataChange(true);
                             break;

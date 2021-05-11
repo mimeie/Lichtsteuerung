@@ -27,6 +27,7 @@ namespace Lichtsteuerung
 
         public LichtsteuerungAuto LichtsteuerungAnkleidezimmer;
         public LichtsteuerungAuto LichtsteuerungWaschraum;
+        public LichtsteuerungAuto LichtsteuerungKeller;
 
         //automatisches ausschalten
         //public List<SensorBool> SpielzimmerBewegungen;
@@ -71,6 +72,7 @@ namespace Lichtsteuerung
             Console.WriteLine("Steuerungsobjekte initieren");
             LichtsteuerungAnkleidezimmer = new LichtsteuerungAuto("Lichtsteuerung Ankleide", "zigbee.0.00158d00063a6d54.occupancy", "shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch", "zigbee.0.00158d00063a6d54.illuminance", "zigbee.0.00158d00025d978b.contact",55,4);
             LichtsteuerungWaschraum = new LichtsteuerungAuto("Lichtsteuerung Waschraum", "zigbee.0.00158d0005228c10.occupancy", "zigbee.0.842e14fffe1f104c.state", "zigbee.0.00158d0005228c10.illuminance", "zigbee.0.00158d0002a70010.contact", 80, 4);
+            LichtsteuerungWaschraum = new LichtsteuerungAuto("Lichtsteuerung Waschraum", "zigbee.0.00158d0005228c10.occupancy", "zigbee.0.842e14fffe1f104c.state", "zigbee.0.00158d0005228c10.illuminance", 80, 4);
 
 
             LichtsteuerungGarderobe = new LichtsteuerungGarderobe();

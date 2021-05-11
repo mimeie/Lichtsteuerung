@@ -31,9 +31,12 @@ namespace Lichtsteuerung
 
         private string _RaumName;
 
+        private bool _hasTuer;
+
         public LichtsteuerungAuto(string raumName, string bewegungId, string schalterId, string helliigkeitId, string tuerId, int helligkeitAbschaltlevel, double minLaufzeit)
         {
             _RaumName = raumName;
+            _hasTuer = true;
             if (SteuerungLogic.Instance.IsDebug == false)
             {
                 RaumBewegung = new SensorBool(bewegungId);
@@ -54,20 +57,53 @@ namespace Lichtsteuerung
 
                 RaumLicht = new Schalter("0_userdata.0.DebugLichtsteuerung.LichtSchalter");
             }
-          
+
 
             //Raum = new Bewegungsmelder();
             //Raum.Bewegung = RaumBewegung;
             //Raum.Helligkeit = RaumHelligkeit;
 
+            constructBase();
+        }
 
-            //StateMachine init
+        public LichtsteuerungAuto(string raumName, string bewegungId, string schalterId, string helliigkeitId, int helligkeitAbschaltlevel, double minLaufzeit)
+        {
+            _RaumName = raumName;
+            _hasTuer = false;
+            if (SteuerungLogic.Instance.IsDebug == false)
+            {
+                RaumBewegung = new SensorBool(bewegungId);
+                RaumBewegung.MinLaufzeitMinutes = minLaufzeit;
+                RaumHelligkeit = new SensorHelligkeit(helliigkeitId, helligkeitAbschaltlevel);          
+
+                RaumLicht = new Schalter(schalterId);
+            }
+            else
+            {
+                RaumBewegung = new SensorBool("0_userdata.0.DebugLichtsteuerung.Bewegung");
+                RaumBewegung.MinLaufzeitMinutes = 4;
+                RaumHelligkeit = new SensorHelligkeit("0_userdata.0.DebugLichtsteuerung.Helligkeit", 50);          
+
+                RaumLicht = new Schalter("0_userdata.0.DebugLichtsteuerung.LichtSchalter");
+            }
+
+
+            //Raum = new Bewegungsmelder();
+            //Raum.Bewegung = RaumBewegung;
+            //Raum.Helligkeit = RaumHelligkeit;
+
+            constructBase();
+        }
+
+        public void constructBase()
+        {
+            Console.WriteLine("StateMachine init");
             StateMachine = new StateMachineLogic();
             StateMachine.CurrentState = State.Aus;
 
             StateMachine._transitions.Add(new StatesTransition(State.Deaktiviert, Signal.GotoAus, GotoStateAus, State.Aus));
 
-            StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoDeaktiviert, GotoStateDeaktiviert,State.Deaktiviert));
+            StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoDeaktiviert, GotoStateDeaktiviert, State.Deaktiviert));
             StateMachine._transitions.Add(new StatesTransition(State.Aus, Signal.GotoReadyForAction, GotoStateReadyForAction, State.ReadyForAction));
 
             StateMachine._transitions.Add(new StatesTransition(State.ReadyForAction, Signal.GotoAus, GotoStateAus, State.Aus));
@@ -77,26 +113,30 @@ namespace Lichtsteuerung
             StateMachine._transitions.Add(new StatesTransition(State.Action, Signal.GotoReadyForAction, GotoStateReadyForAction, State.ReadyForAction));
             StateMachine._transitions.Add(new StatesTransition(State.Action, Signal.GotoAus, GotoStateAus, State.Aus));
             StateMachine._transitions.Add(new StatesTransition(State.Action, Signal.GotoDeaktiviert, GotoStateDeaktiviert, State.Deaktiviert));
-
-
-
-            
         }
 
         public void Initialize()
         {
 
+            
+
+
             Console.WriteLine("updates der anlage holen");
             RaumBewegung.Update();
             RaumHelligkeit.Update();
-            RaumTuer.Update();
+            
             RaumLicht.Update();
 
             RaumBewegung.DataChange += DoDataChange;
-            RaumHelligkeit.DataChange += DoDataChange;
-            RaumTuer.DataChange += DoDataChange;
+            RaumHelligkeit.DataChange += DoDataChange;            
             RaumLicht.DataChange += DoDataChange;
             SteuerungLogic.Instance.JemandZuhause.DataChange += DoDataChange;
+
+            if (_hasTuer == true)
+            { 
+            RaumTuer.Update();
+            RaumTuer.DataChange += DoDataChange;
+            }
 
             Console.WriteLine("updates der anlage geholt");
 
@@ -228,7 +268,7 @@ namespace Lichtsteuerung
                     }
                 }
 
-                if (source == RaumTuer)
+                if (source == RaumTuer && _hasTuer == true)
                 {
                     Console.WriteLine("Tür überprüfen");
                     if (RaumTuer.Status == false && StateMachine.CurrentState == State.ReadyForAction)
