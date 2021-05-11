@@ -33,13 +33,13 @@ namespace Lichtsteuerung
 
         private bool _hasTuer;
 
-        public LichtsteuerungAuto(string raumName, string bewegungId, string schalterId, string helliigkeitId, string tuerId, int helligkeitAbschaltlevel, double minLaufzeit)
+        public LichtsteuerungAuto(string raumName, string bewegungId, SourceType bewegungSource, string schalterId, string helliigkeitId, string tuerId, int helligkeitAbschaltlevel, double minLaufzeit)
         {
             _RaumName = raumName;
             _hasTuer = true;
             if (SteuerungLogic.Instance.IsDebug == false)
             {
-                RaumBewegung = new SensorBool(bewegungId);
+                RaumBewegung = new SensorBool(bewegungId, bewegungSource);
                 RaumBewegung.MinLaufzeitMinutes = minLaufzeit;
                 RaumHelligkeit = new SensorHelligkeit(helliigkeitId, helligkeitAbschaltlevel);
 
@@ -66,13 +66,13 @@ namespace Lichtsteuerung
             constructBase();
         }
 
-        public LichtsteuerungAuto(string raumName, string bewegungId, string schalterId, string helliigkeitId, int helligkeitAbschaltlevel, double minLaufzeit)
+        public LichtsteuerungAuto(string raumName, string bewegungId, SourceType bewegungSource, string schalterId, string helliigkeitId, int helligkeitAbschaltlevel, double minLaufzeit)
         {
             _RaumName = raumName;
             _hasTuer = false;
             if (SteuerungLogic.Instance.IsDebug == false)
             {
-                RaumBewegung = new SensorBool(bewegungId);
+                RaumBewegung = new SensorBool(bewegungId, bewegungSource);
                 RaumBewegung.MinLaufzeitMinutes = minLaufzeit;
                 RaumHelligkeit = new SensorHelligkeit(helliigkeitId, helligkeitAbschaltlevel);          
 
@@ -121,10 +121,9 @@ namespace Lichtsteuerung
             
 
 
-            Console.WriteLine("updates der anlage holen");
+            Console.WriteLine("{0} updates der anlage holen", _RaumName);
             RaumBewegung.Update();
-            RaumHelligkeit.Update();
-            
+            RaumHelligkeit.Update();            
             RaumLicht.Update();
 
             RaumBewegung.DataChange += DoDataChange;
@@ -138,7 +137,7 @@ namespace Lichtsteuerung
             RaumTuer.DataChange += DoDataChange;
             }
 
-            Console.WriteLine("updates der anlage geholt");
+            Console.WriteLine("{0} updates der anlage geholt", _RaumName);
 
             LichtsteuerungLogikAllOthers(SteuerungLogic.Instance.JemandZuhause);
 
@@ -196,7 +195,7 @@ namespace Lichtsteuerung
             {
                 LichtsteuerungLogik(RaumBewegung);
             }
-            if (source != RaumTuer)
+            if (source != RaumTuer && _hasTuer == true)
             {
                 LichtsteuerungLogik(RaumTuer);
             }
@@ -207,8 +206,15 @@ namespace Lichtsteuerung
         private void LichtsteuerungLogik(Objekt source)          
         {
             lock (logikLock)
-            {                
-                Console.WriteLine("{0} Lichtsteuerung abarbeiten, aktueller Status: {1}, Zuhause: {2}, Bewegung: {3}, helligkeit: {4}, Tür: {5}, Licht Status: {6}, source-id: {7}", _RaumName, StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status, RaumBewegung.Status, RaumHelligkeit.Helligkeit, RaumTuer.Status, RaumLicht.Status, source.ObjektId);
+            {
+                if (_hasTuer == true)
+                {
+                    Console.WriteLine("{0} Lichtsteuerung abarbeiten, aktueller Status: {1}, Zuhause: {2}, Bewegung: {3}, helligkeit: {4}, Tür: {5}, Licht Status: {6}", _RaumName, StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status, RaumBewegung.Status, RaumHelligkeit.Helligkeit, RaumTuer.Status, RaumLicht.Status);
+                }
+                else
+                {
+                    Console.WriteLine("{0} Lichtsteuerung abarbeiten, aktueller Status: {1}, Zuhause: {2}, Bewegung: {3}, helligkeit: {4}, Licht Status: {5}", _RaumName, StateMachine.CurrentState, SteuerungLogic.Instance.JemandZuhause.Status, RaumBewegung.Status, RaumHelligkeit.Helligkeit, RaumLicht.Status);
+                }
 
                 if (source == SteuerungLogic.Instance.JemandZuhause)
                 {
@@ -227,7 +233,7 @@ namespace Lichtsteuerung
 
                 if (source == RaumHelligkeit)
                 {
-                    Console.WriteLine("Helligkeit überprüfen");
+                    Console.WriteLine("{0} Helligkeit überprüfen", _RaumName);
                     if (StateMachine.CurrentState == State.Aus && RaumHelligkeit.Helligkeit < RaumHelligkeit.Abschaltlevel)
                     {
                         StateMachine.ExecuteAction(Signal.GotoReadyForAction);
@@ -243,7 +249,7 @@ namespace Lichtsteuerung
 
                 if (source == RaumBewegung)
                 {
-                    Console.WriteLine("Bewegungszustand überprüfen");
+                    Console.WriteLine("{0} Bewegungszustand überprüfen", _RaumName);
                     if (RaumBewegung.Status == true && StateMachine.CurrentState == State.ReadyForAction)
                     {
                         StateMachine.ExecuteAction(Signal.GotoAction);                       
@@ -253,15 +259,15 @@ namespace Lichtsteuerung
                         //erst nach Ablauf der Restlaufzeit gehen
                         if (RaumBewegung.HasRestlaufzeit(RaumBewegung.LastChangeTrue) == false)
                         {
-                            Console.WriteLine("Licht kann wieder ausgeschaltet werden, keine Restlaufzeit");
+                            Console.WriteLine("{0} Licht kann wieder ausgeschaltet werden, keine Restlaufzeit" ,_RaumName);
                             StateMachine.ExecuteAction(Signal.GotoReadyForAction);
                         }
                         else
                         {
                             //https://stackoverflow.com/questions/545533/delayed-function-calls
-                            Console.WriteLine("Licht kann später ausgeschaltet werden, Restlaufzeit: {0}", RaumBewegung.RestlaufzeitMinutes(RaumBewegung.LastChangeTrue));
+                            Console.WriteLine("{0} Licht kann später ausgeschaltet werden, Restlaufzeit: {1}",_RaumName, RaumBewegung.RestlaufzeitMinutes(RaumBewegung.LastChangeTrue));
                             Task.Delay(TimeSpan.FromMinutes(RaumBewegung.RestlaufzeitMinutes(RaumBewegung.LastChangeTrue))).ContinueWith(t => LichtsteuerungLogik(RaumBewegung));
-                            Console.WriteLine("späteres ausschalten getriggert");
+                            //Console.WriteLine("späteres ausschalten getriggert");
 
                         }                        
                         
@@ -270,7 +276,7 @@ namespace Lichtsteuerung
 
                 if (source == RaumTuer && _hasTuer == true)
                 {
-                    Console.WriteLine("Tür überprüfen");
+                    Console.WriteLine("{0} Tür überprüfen", _RaumName);
                     if (RaumTuer.Status == false && StateMachine.CurrentState == State.ReadyForAction)
                     {
                         StateMachine.ExecuteAction(Signal.GotoAction);
@@ -278,13 +284,13 @@ namespace Lichtsteuerung
                     }
                     else if (RaumTuer.Status == true && RaumBewegung.Status == false && StateMachine.CurrentState == State.Action)
                     {
-                        Console.WriteLine("Tür war nur kurz offen");
+                        Console.WriteLine("{0} Tür war nur kurz offen", _RaumName);
                         StateMachine.ExecuteAction(Signal.GotoReadyForAction);
                        
                     }
                 }
 
-                Console.WriteLine("Raum lichtsteuerung abgearbeitet, Status: {0}", StateMachine.CurrentState);
+                Console.WriteLine("Raum {0} lichtsteuerung abgearbeitet, Status: {1}", _RaumName, StateMachine.CurrentState);
             }
         }
 
@@ -292,7 +298,7 @@ namespace Lichtsteuerung
 
         private void DoDataChange(object sender, Objekt source)
         {
-            Console.WriteLine("DataChange für Raumzimmer : {0}", source);
+            Console.WriteLine("DataChange für: {0}, Objekt ID: {1}", _RaumName, source.ObjektId);
 
             LichtsteuerungLogik(source);
 

@@ -70,9 +70,9 @@ namespace Lichtsteuerung
         public void Start()
         {
             Console.WriteLine("Steuerungsobjekte initieren");
-            LichtsteuerungAnkleidezimmer = new LichtsteuerungAuto("Lichtsteuerung Ankleide", "zigbee.0.00158d00063a6d54.occupancy", "shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch", "zigbee.0.00158d00063a6d54.illuminance", "zigbee.0.00158d00025d978b.contact",55,4);
-            LichtsteuerungWaschraum = new LichtsteuerungAuto("Lichtsteuerung Waschraum", "zigbee.0.00158d0005228c10.occupancy", "zigbee.0.842e14fffe1f104c.state", "zigbee.0.00158d0005228c10.illuminance", "zigbee.0.00158d0002a70010.contact", 80, 4);
-            LichtsteuerungWaschraum = new LichtsteuerungAuto("Lichtsteuerung Waschraum", "zigbee.0.00158d0005228c10.occupancy", "zigbee.0.842e14fffe1f104c.state", "zigbee.0.00158d0005228c10.illuminance", 80, 4);
+            LichtsteuerungAnkleidezimmer = new LichtsteuerungAuto("Lichtsteuerung Ankleide", "zigbee.0.00158d00063a6d54.occupancy", SourceType.TrueFalse, "shelly.0.SHSW-25#D8BFC01A2B2A#1.Relay0.Switch", "zigbee.0.00158d00063a6d54.illuminance", "zigbee.0.00158d00025d978b.contact",55,4);
+            LichtsteuerungWaschraum = new LichtsteuerungAuto("Lichtsteuerung Waschraum", "zigbee.0.00158d0005228c10.occupancy", SourceType.TrueFalse, "zigbee.0.842e14fffe1f104c.state", "zigbee.0.00158d0005228c10.illuminance", "zigbee.0.00158d0002a70010.contact", 80, 4);
+            LichtsteuerungKeller = new LichtsteuerungAuto("Lichtsteuerung Keller", "zwave2.0.Node_003.Basic.currentValue",SourceType.Integer, "zigbee.0.588e81fffeb3c6b4.state", "zwave2.0.Node_003.Multilevel_Sensor.illuminance", 80, 4);
 
 
             LichtsteuerungGarderobe = new LichtsteuerungGarderobe();
@@ -103,8 +103,15 @@ namespace Lichtsteuerung
             JemandZuhause.Update();
 
             LichtsteuerungAnkleidezimmer.Initialize();
+            LichtsteuerungWaschraum.Initialize();
+            LichtsteuerungKeller.Initialize();
+
             LichtsteuerungGarderobe.Initialize();
+
             LichtsteuerungSpielzimmer.Initialize();
+            LichtsteuerungPhilomenaStehlampe.Initialize();
+            LichtsteuerungKueche.Initialize();
+            LichtsteuerungWohnzimmer.Initialize();
 
 
             Console.WriteLine("JobManager wurde initialisiert");

@@ -167,17 +167,21 @@ namespace Lichtsteuerung
 
                         case "lichtwaschraum":
                             switch (source)
-                            {
+                            {                                
                                 case "WaschraumBewegung":
+                                    //Console.WriteLine("Licht Waschraum Case mit WaschraumBewegung");
                                     SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumBewegung.RaiseDataChange(true);
                                     break;
                                 case "WaschraumTuer":
+                                    //Console.WriteLine("Licht Waschraum Case mit WaschraumTuer");
                                     SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumTuer.RaiseDataChange(true);
                                     break;
                                 case "WaschraumLicht":
+                                    //Console.WriteLine("Licht Waschraum Case mit WaschraumLicht");
                                     SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumLicht.RaiseDataChange(true);
                                     break;
                                 case "WaschraumHelligkeit":
+                                    //Console.WriteLine("Licht Waschraum Case mit WaschraumHelligkeit");
                                     SteuerungLogic.Instance.LichtsteuerungWaschraum.RaumHelligkeit.RaiseDataChange(true);
                                     break;
                             }
@@ -204,7 +208,7 @@ namespace Lichtsteuerung
                     }
                 }
                                      
-                Console.WriteLine("getter fertig ausgeführt, dauer: {0}", sw.ElapsedMilliseconds);
+                Console.WriteLine("getter {0} fertig ausgeführt, dauer: {1}",id, sw.ElapsedMilliseconds);
                 sw.Stop();
 
                 return new ResponseTrigger
